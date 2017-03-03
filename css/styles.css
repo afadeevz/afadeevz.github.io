@@ -1,0 +1,119 @@
+/*div
+{
+    border: 1px solid black;
+}*/
+
+h1
+{
+    font: 'Roboto', Serif;
+    font-size: 42pt;
+    color: #3e464a;
+}
+
+h2, h3, h4
+{
+    font: 'Roboto', Serif;
+    color: #03486b;
+}
+
+h2
+{
+    font-size: 36pt;
+}
+
+h3
+{
+    font-size: 24pt;
+}
+
+h4
+{
+    font-size: 18pt;
+}
+
+.text/*, p, li, blockquote*/
+{
+    font: 'PT Serif', Serif;
+    font-size: 16pt;
+    line-height: 1.5em;
+    color: #333333;
+}
+
+.wrapper
+{
+    width: 1200px;
+    margin: 0 auto;
+}
+
+.cleanfix
+{
+    clear: both;
+}
+
+.introduction
+{
+    float: left;
+    width: 950px;
+}
+
+.photo
+{
+    float: right;
+    height: 250px
+}
+
+.skills
+{
+    float: left;
+    width: 600px;
+}
+
+.quote
+{
+    float: right;
+    width: 550px;
+
+}
+
+.quote_author
+{
+    text-align: right;
+}
+
+.movie
+{
+    float: left;
+    width: 270px;
+    margin: 10px;
+    text-align: justify;
+}
+
+.movie_image
+{
+    display: block;
+    margin: auto;
+    height: 400px;
+} 
+
+.movie_text
+{
+    text-indent: 30px;
+}
+
+
+.movie_header
+{
+    text-align: center;
+}
+
+.music
+{
+    float: left;
+    width: 600px;
+}
+
+.contact
+{
+    float: left; 
+    width: 450px;
+}
