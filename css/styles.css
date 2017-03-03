@@ -117,7 +117,7 @@ h4
         width: 400px;
     }
 
-    .movie_image
+    .movie_image, .photo_image
     {
         height: auto;
         width: 100%;
