@@ -56,20 +56,20 @@ function gameTick()
     y += Vy*dt;
     if (mouseOver)
     {
-        let dax = 5*(mouseX - x) - 0.01*Vx;
-        Vx += dax*dt;
-        x  += dax*dt**2/2;
-        let day = 5*(mouseY - y) - 0.01*Vy;
-        Vy += day*dt;
-        y  += day*dt**2/2;
+        let ax = 5*(mouseX - x) - 0.01*Vx;
+        Vx += ax*dt;
+        x  += ax*dt**2/2;
+        let ay = 5*(mouseY - y) - 0.01*Vy;
+        Vy += ay*dt;
+        y  += ay*dt**2/2;
     }
     {
-        let dax = -0.1*Vx;
-        Vx += dax*dt;
-        x  += dax*dt**2/2;
-        let day = -0.1*Vy;
-        Vy += day*dt;
-        y  += day*dt**2/2;
+        let ax = -0.1*Vx;
+        Vx += ax*dt;
+        x  += ax*dt**2/2;
+        let ay = -0.1*Vy;
+        Vy += ay*dt;
+        y  += ay*dt**2/2;
     }
     if (x < r)
     {
