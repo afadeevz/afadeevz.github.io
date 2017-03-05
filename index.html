@@ -1,129 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>About</title>
+  <title>Arkanoid</title>
   <meta charset="utf-8"> 
   <meta name="viewport" content="width=device-width">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link rel="stylesheet" type="text/css" href="css/styles.css">
+  <link rel="stylesheet" type="text/css" href="styles/index.css">
   <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=PT+Serif" rel="stylesheet">
+  <script type="text/javascript" src="scripts/game.js"></script>
 </head>
-<body>
+<body onload="initialize()">
   <div class="wrapper">
-    <div class="header">
-      <h1>About</h1>
-      <h2>Page which introduces me</h2>
-    </div>
+    <canvas id="game_area" class="game_area"></canvas>
     <div class="clearfix"></div>
-    <div class="introduction basic">
-      <h3>Hello</h3>
-      <p class="text">
-        My name is Alexander Fadeev and I'm 19 years old. 
-        I'm student at Povolzhsky State Technical University. 
-        My specialization is system programming. 
-        I want to tell you some information about me.
-      </p>
+    <div class="footer">
+      <a href="about.html">About me</a>
     </div>
-    <div class="clear_breakpoint2"></div>
-    <div class="photo basic">
-      <h3>My cat (why not?)</h3>
-      <img class="photo_image" src="images/cat.jpg" alt="cat">
-    </div>
-    <div class="clearfix"></div>
-    <div class="skills basic">
-      <h3>What I know</h3>
-      <ul class="text">
-        <li>Intermediate English</li>
-        <li>Beginner HTML + CSS</li>
-        <li>Basic C++ (STL)</li>
-        <li>Competitive Programming</li>
-      </ul>
-    </div>
-    <div class="clear_breakpoint2"></div>
-    <div class="quote basic">
-      <h3>My favourite quote</h3>
-      <p class="text">
-        « Two things are infinite: the universe and human stupidity; 
-        and I'm not sure about the universe. »
-      </p>
-      <p class="text quote_author">― Albert Einstein</p>
-    </div>
-    <div class="clearfix"></div>
-    <div class="movies">
-      <h3>My favourite movies</h3>
-      <div class="movie">
-        <img class="movie_image" src="images/interstellar_movie.jpg" alt="Interstellar movie">
-        <h4 class="movie_header">Interstellar</h4>
-        <p class="text movie_text">
-          A team of explorers must find the human race a new 
-          home after earth is struck with worldwide food 
-          shortages and corn is the most valuable food. 
-          Utilizing a mysterious wormhole they explore strange
-          new worlds and could find a home to save the human 
-          race.
-        </p>
-      </div>
-      <div class="clear_breakpoint2"></div>
-      <div class="movie">
-        <img class="movie_image" src="images/BTTF_movie.jpg" alt="BTTF movie">
-        <h4 class="movie_header">Back to the Future</h4>
-        <p class="text movie_text">
-          Marty McFly, a typical American teenager of the 
-          Eighties, is accidentally sent back to 1955 in a 
-          plutonium-powered DeLorean "time machine" invented by 
-          a slightly mad scientist. During his often 
-          hysterical, always amazing trip back in time, Marty 
-          must make certain his teenage parents-to-be meet and 
-          fall in love - so he can get back to the future.
-        </p>
-      </div>
-      <div class="clear_breakpoint1"></div>
-      <div class="movie">
-        <img class="movie_image" src="images/martian_movie.jpg" alt="Martian movie">
-        <h4 class="movie_header">Martian</h4>
-        <p class="text movie_text">
-          After a massive storm forces his crew to leave the 
-          planet, an astronaut, Mark Watney (played by Matt 
-          Damon), is marooned on Mars, and presumed dead. 
-          Figuring that it would be at least four years until 
-          someone can rescue him, he sets out, though often 
-          ingenious means, to survive.
-        </p>
-      </div>
-      <div class="clear_breakpoint2"></div>
-      <div class="movie">
-        <img class="movie_image" src="images/warcraft_movie.jpg" alt="Warcraft movie">
-        <h4 class="movie_header">Warcraft</h4>
-        <p class="text movie_text">
-          As an Orc horde invades the planet Azeroth using a 
-          magic portal, a few human heroes and dissenting Orcs 
-          must attempt to stop the true evil behind this war.
-        </p>
-      </div>
-      <div class="clearfix"></div>
-    </div>
-    <div class="clearfix"></div>
-    <div class="music basic">
-      <h3>My favourite music styles</h3>
-      <ol class="text">
-        <li>Hardstyle</li>
-        <li>Drum and Bass</li>
-        <li>Neurofunk</li>
-        <li>Trap</li>
-        <li>Dubstep</li>
-      </ol> 
-    </div>
-    <div class="clear_breakpoint2"></div>
-    <div class="contact basic">
-      <h3>Contact me</h3>
-      <ul class="text">
-        <li>VK - <a href="https://vk.com/alex12rus">vk.com/alex12rus</a></li>
-        <li>Email - <a href="mailto:1alexking1@gmail.com">1alexking1@gmail.com</a></li>
-        <li>Telegram - <a href="https://t.me/AlexunderF">t.me/AlexunderF</a></li>
-        <li>Mobile phone - +7 (987) 732-00-06</li>
-      </ul>
-    </div>
+
+    <div id="info"></div>
   </div>
 </body>
 </html>

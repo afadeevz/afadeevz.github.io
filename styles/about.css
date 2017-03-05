@@ -1,3 +1,8 @@
+/*div
+{
+    background: rgba(255,0,0,.1);
+}*/
+
 h1
 {
     font: 'Roboto', Serif;
@@ -73,7 +78,7 @@ h4
 .movie_image
 {
     display: block;
-    margin: auto;
+    margin: 0 auto;
     height: 400px;
 } 
 
@@ -99,7 +104,7 @@ h4
         width: 800px;
     }
 
-    .basic,.movie
+    .basic, .movie
     {
         width: 380px;
     }
@@ -119,8 +124,8 @@ h4
 
     .movie_image, .photo_image
     {
-        height: auto;
         width: 80%;
+        height: auto;
     }
 
     *

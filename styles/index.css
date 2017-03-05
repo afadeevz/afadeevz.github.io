@@ -1,0 +1,24 @@
+/*div, canvas
+{
+    background: rgba(255,0,0,.05);   
+}*/
+
+.wrapper
+{
+    padding: 15px;
+    width: auto;
+    max-width: 2000px;
+    text-align: center;
+}
+
+.clearfix
+{
+    clear: both;
+}
+
+.game_area
+{
+    margin: 0 auto;
+    border: 1px solid black;
+    width: 100%;
+}
