@@ -1,15 +1,15 @@
-var x, y, mouseX, mouseY, mouseOver, Vx = 0, Vy = 0, r = 50, w = 1920, h = 1080;
+var x, y, mouseX, mouseY, mouseOver, mousePressed, Vx = 0, Vy = 0, r = 50, w = 1920, h = 1080;
 const UPS = 60, dt = 1/UPS;
 
 function initialize()
 {
-    addEventListener("resize", updateSize)
-    game_area.addEventListener("mousemove",  updateMousePosition);
-    game_area.addEventListener("mouseover",  updateMouseOver);
-    game_area.addEventListener("mouseout",   updateMouseOut);
-    game_area.addEventListener("touchmove",  updateMousePosition);
-    game_area.addEventListener("touchstart", updateMouseOver);
-    game_area.addEventListener("touchend",   updateMouseOut);
+    addEventListener("resize", updateSize);
+    ["mousemove", "touchstart","touchmove"].forEach(function(e){game_area.addEventListener(e, updateMousePosition);});
+    ["mousedown", "touchstart"].forEach(function(e){game_area.addEventListener(e, function(){mousePressed = true;});});
+    ["mouseup"  , "touchend"  ].forEach(function(e){window.addEventListener(e, function(){mousePressed = false;});});
+    ["mouseover"].forEach(function(e){game_area.addEventListener(e, function(){mouseOver = true;});});
+    ["mouseout" ].forEach(function(e){game_area.addEventListener(e, function(){mouseOver = false;});});
+
     updateSize();
     game_area.width = w;
     game_area.height = h;
@@ -17,6 +17,10 @@ function initialize()
     mouseY = game_area.height/2;
     x = game_area.width/2;
     y = game_area.height/2;
+
+    let context = game_area.getContext("2d");
+    context.font = "20px Serif"
+
     window.setInterval(gameTick, 1000/UPS);
 }
 
@@ -36,38 +40,42 @@ function updateSize()
 function updateMousePosition(p)
 {
     b = game_area.getBoundingClientRect();
-    mouseX = (p.pageX - b.left)*game_area.width /parseInt(game_area.clientWidth);
-    mouseY = (p.pageY - b.top) *game_area.height/parseInt(game_area.clientHeight);
+    if (!p.clientX)
+    {
+        mouseX = (p.touches[0].clientX - b.left)*w/game_area.clientWidth;
+        mouseY = (p.touches[0].clientY - b.top) *h/game_area.clientHeight;
+        if (mouseX < 0 || mouseX > w || mouseY < 0 || mouseY > h)
+            mouseOver = false;
+        else
+            mouseOver = true; 
+    }
+    else
+    {
+        mouseX = (p.clientX - b.left)*w/game_area.clientWidth;
+        mouseY = (p.clientY - b.top) *h/game_area.clientHeight;
+    }
 }
 
-function updateMouseOver(p)
-{
-    mouseOver = true;
-}
-
-function updateMouseOut(p)
-{
-    mouseOver = false;
-}
+const kFres = -0.25;
 
 function gameTick()
 {
     x += Vx*dt;
     y += Vy*dt;
-    if (mouseOver)
+    if (mouseOver && mousePressed)
     {
-        let ax = 5*(mouseX - x) - 0.01*Vx;
+        let ax = 5*(mouseX - x);
         Vx += ax*dt;
         x  += ax*dt**2/2;
-        let ay = 5*(mouseY - y) - 0.01*Vy;
+        let ay = 5*(mouseY - y);
         Vy += ay*dt;
         y  += ay*dt**2/2;
     }
     {
-        let ax = -0.1*Vx;
+        let ax = kFres*Vx;
         Vx += ax*dt;
         x  += ax*dt**2/2;
-        let ay = -0.1*Vy;
+        let ay = kFres*Vy;
         Vy += ay*dt;
         y  += ay*dt**2/2;
     }
@@ -99,6 +107,6 @@ function gameTick()
     context.clearRect(0, 0, game_area.width, game_area.height);
     context.beginPath();
     context.arc(x, y, 50, 0, 2 * Math.PI, false);
-    context.fillStyle = 'green';
+    context.fillStyle = "#01BACE";
     context.fill();
 }

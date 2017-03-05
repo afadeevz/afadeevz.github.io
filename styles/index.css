@@ -1,8 +1,3 @@
-/*div, canvas
-{
-    background: rgba(255,0,0,.05);   
-}*/
-
 .wrapper
 {
     padding: 15px;
@@ -19,6 +14,6 @@
 .game_area
 {
     margin: 0 auto;
-    border: 1px solid black;
+    border: 1px solid #5D4C5E;
     width: 100%;
 }
