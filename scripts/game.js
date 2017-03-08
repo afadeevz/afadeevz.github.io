@@ -19,9 +19,10 @@ function initialize()
     y = game_area.height/2;
 
     let context = game_area.getContext("2d");
-    context.font = "20px Serif"
-
-    window.setInterval(gameTick, 1000/UPS);
+    context.font = "64pt Serif"
+    context.fillText("Press mouse button or\ntouch the screen to move the ball",10,100);
+    // while (!mousePressed);
+    window.setTimeout(function(){window.setInterval(gameTick, 1000/UPS);},1500);
 }
 
 function updateSize()
@@ -103,7 +104,7 @@ function gameTick()
         Vy *= -0.75;
     }
 
-    var context = game_area.getContext("2d");
+    let context = game_area.getContext("2d");
     context.clearRect(0, 0, game_area.width, game_area.height);
     context.beginPath();
     context.arc(x, y, 50, 0, 2 * Math.PI, false);

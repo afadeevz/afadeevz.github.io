@@ -119,13 +119,22 @@ h4
 
     .wrapper
     {
-        width: 400px;
+        width: 100%;
+    }
+
+    .basic, .movie
+    {
+        float: none;
+        margin: 0 auto;
+        width: 90%;
     }
 
     .movie_image, .photo_image
     {
-        width: 80%;
+        width: auto;
+        max-width: 100%;
         height: auto;
+        max-height: 480px;
     }
 
     *
