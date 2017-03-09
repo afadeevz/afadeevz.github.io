@@ -21,7 +21,6 @@ function initialize()
     let context = game_area.getContext("2d");
     context.font = "64pt Serif"
     context.fillText("Press mouse button or\ntouch the screen to move the ball",10,100);
-    // while (!mousePressed);
     window.setTimeout(function(){window.setInterval(gameTick, 1000/UPS);},1500);
 }
 

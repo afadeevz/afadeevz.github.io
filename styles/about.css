@@ -3,16 +3,21 @@
     background: rgba(0,255,0,.1);
 }*/
 
+body
+{
+    margin: 0;
+}
+
 h1
 {
-    font: 'Roboto', Serif;
+    font-family: 'Roboto', Serif;
     font-size: 42pt;
     color: #3e464a;
 }
 
 h2, h3, h4
 {
-    font: 'Roboto', Serif;
+    font-family: 'Roboto', Serif;
     color: #03486b;
 }
 
@@ -33,10 +38,11 @@ h4
 
 .text
 {
-    font: 'PT Serif', Serif;
+    font-family: 'PT Serif', Serif;
     font-size: 14pt;
     line-height: 1.5em;
     color: #333333;
+    padding: 15px;
 }
 
 .wrapper
@@ -45,7 +51,7 @@ h4
     margin: 0 auto;
 }
 
-.clearfix
+.clear
 {
     clear: both;
 }
@@ -92,9 +98,9 @@ h4
     text-indent: 30px;
 }
 
-@media screen and (max-width: 1225px)
+@media screen and (max-width: 1220px)
 {
-    .clear_breakpoint1
+    .clear_medium
     {
         clear: both;
     }
@@ -110,9 +116,9 @@ h4
     }
 }
 
-@media screen and (max-width: 825px)
+@media screen and (max-width: 820px)
 {
-    .clear_breakpoint2
+    .clear_small
     {
         clear: both;
     }
@@ -129,6 +135,12 @@ h4
         width: 100%;
     }
 
+    .skills, .music, .contact
+    {
+        width: 400px;
+        max-width: 100%;
+    }
+
     .movie_image, .photo_image
     {
         width: auto;
@@ -137,7 +149,7 @@ h4
         max-height: 480px;
     }
 
-    *
+    .text, .header, .photo
     {
         text-align: center;
     }
