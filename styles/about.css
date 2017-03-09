@@ -1,6 +1,6 @@
 /*div
 {
-    background: rgba(255,0,0,.1);
+    background: rgba(0,255,0,.1);
 }*/
 
 h1
@@ -126,7 +126,7 @@ h4
     {
         float: none;
         margin: 0 auto;
-        width: 90%;
+        width: 100%;
     }
 
     .movie_image, .photo_image
