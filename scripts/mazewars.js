@@ -115,20 +115,46 @@ class cFPSCounter
     }
 }
 
+class cKeyboard
+{
+    constructor()
+    {
+        this.pressed = [];
+    }
+
+    update(e)
+    {  
+        if (e.type == "keypress" || e.type == "keydown")
+            this.pressed[e.code] = true;
+        else if (e.type == "keyup")
+            this.pressed[e.code] = false;
+        this.isPressed(e.code);
+    }
+
+    isPressed(keyCode)
+    {
+        if (this.pressed[keyCode] == undefined)
+            return false;
+        return this.pressed[keyCode];
+    }
+}
+
 class cGame
 {
     constructor(canvas)
     {
+        console.log("Game: Initialization")
         this.canvas = canvas;
         this.context = canvas.getContext("2d");
         this.UPS = 60;
         this.camera = {x: 960, y: 960, vx: 0, vy: 0, angle: Math.PI/4};
         this.FPSCounter = new cFPSCounter();
+        this.keyboard = new cKeyboard();
         this.keysStatus = {};
-        console.log("Game: Initialization")
         this.resize();
         let that = this;
         window.addEventListener("resize", function(){that.resize();});
+        ["keydown", "keypress", "keyup"].forEach(function(e){window.addEventListener(e, function(e){that.keyboard.update(e)});});
     }
 
     resize()
@@ -198,8 +224,33 @@ class cGame
 
     tick()
     {
-        // that.camera.x--;
-        // that.camera.y--;
-        this.camera.angle += Math.PI/180;
+        if (this.keyboard.isPressed("KeyW"))
+        {
+            this.camera.x += 10*Math.cos(this.camera.angle + Math.PI/2);
+            this.camera.y -= 10*Math.sin(this.camera.angle + Math.PI/2);
+        }
+        if (this.keyboard.isPressed("KeyS"))
+        {
+            this.camera.x += 10*Math.cos(this.camera.angle - Math.PI/2);
+            this.camera.y -= 10*Math.sin(this.camera.angle - Math.PI/2);
+        }
+        if (this.keyboard.isPressed("KeyA"))
+        {
+            this.camera.x += 10*Math.cos(this.camera.angle + Math.PI);
+            this.camera.y -= 10*Math.sin(this.camera.angle + Math.PI);
+        }
+        if (this.keyboard.isPressed("KeyD"))
+        {
+            this.camera.x += 10*Math.cos(this.camera.angle);
+            this.camera.y -= 10*Math.sin(this.camera.angle);
+        }
+        if (this.keyboard.isPressed("KeyQ"))   
+        {
+            this.camera.angle += Math.PI/90;
+        }
+        if (this.keyboard.isPressed("KeyE"))   
+        {
+            this.camera.angle -= Math.PI/90;
+        }
     }
 }
