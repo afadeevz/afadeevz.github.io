@@ -1,0 +1,42 @@
+*
+{
+	padding: 0;
+	margin: 0;
+}
+
+.clear
+{
+	clear: both;
+}
+
+.wrapper
+{
+	width: auto;
+	padding: 15px;
+	text-align: center;
+}
+
+.gameCanvas
+{
+	width: 100%;
+	background-color: rgba(0,0,0,.75);
+}
+
+.footer
+{
+	display: inline-block;
+	margin: 15px;
+}
+
+@media (device-width: 100vw) and (device-height: 100vh)
+{
+	.wrapper
+	{
+		padding: 0;
+	}
+
+	body
+	{
+		overflow-y: hidden;
+	}
+}

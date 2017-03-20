@@ -1,19 +1,23 @@
-.wrapper
-{
-    padding: 15px;
-    width: auto;
-    max-width: 2000px;
-    text-align: center;
-}
-
-.clearfix
+.clear
 {
     clear: both;
 }
 
-.game_area
+body
 {
+    text-align: center;
+}
+
+.wrapper
+{
+    display: inline-block;
+    max-width: 600px;
     margin: 0 auto;
-    border: 1px solid #5D4C5E;
-    width: 100%;
+}
+
+.link
+{
+    float: left;
+    width: auto;
+    margin: 0 20px;
 }
