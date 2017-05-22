@@ -147,7 +147,7 @@ class Drawer {
         let r = h / 50;
         this.context.lineWidth = 3;
 
-        this.context.strokeStyle = "#CC0000";
+        this.context.strokeStyle = "#EE0000";
         this.context.beginPath();
         this.context.moveTo(x, y);
         x += l1 * Math.cos(this.aAngle(this.t));
@@ -155,7 +155,7 @@ class Drawer {
         this.context.lineTo(x, y);
         this.context.stroke();
 
-        this.context.strokeStyle = "#00CC00";
+        this.context.strokeStyle = "#00EE00";
         this.context.beginPath();
         this.context.moveTo(x, y);
         x += l2 * Math.cos(this.bAngle(this.t));
