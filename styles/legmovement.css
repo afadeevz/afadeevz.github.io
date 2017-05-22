@@ -4,10 +4,13 @@ body {
     margin: 0;
 }
 
-.wrapper,
+.wrapper {
+    background-color: #EEEEEE;
+}
+
 .editor,
 .drawerCanvas {
-    background-color: rgba(0, 255, 32, .1);
+    background-color: #DDDDDD;
 }
 
 .clearfix {
@@ -26,6 +29,7 @@ body {
     float: left;
     margin: 16px 5%;
     padding: 16px;
+    border: 1px solid rgba(0, 0, 0, .1);
 }
 
 .input {
@@ -34,7 +38,6 @@ body {
 }
 
 .inputName {
-    min-width: 32px;
     margin: 0;
     float: left;
 }

@@ -145,10 +145,9 @@ class Drawer {
         let x = w / 2;
         let y = h / 10;
         let r = h / 50;
-        this.context.beginPath();
-        this.context.arc(x, y, r, 0, 2 * Math.PI);
-        this.context.stroke();
+        this.context.lineWidth = 3;
 
+        this.context.strokeStyle = "#CC0000";
         this.context.beginPath();
         this.context.moveTo(x, y);
         x += l1 * Math.cos(this.aAngle(this.t));
@@ -156,10 +155,7 @@ class Drawer {
         this.context.lineTo(x, y);
         this.context.stroke();
 
-        this.context.beginPath();
-        this.context.arc(x, y, r, 0, 2 * Math.PI);
-        this.context.stroke();
-
+        this.context.strokeStyle = "#00CC00";
         this.context.beginPath();
         this.context.moveTo(x, y);
         x += l2 * Math.cos(this.bAngle(this.t));
@@ -167,6 +163,27 @@ class Drawer {
         this.context.lineTo(x, y);
         this.context.stroke();
 
+        x = w / 2;
+        y = h / 10;
+        r = h / 50;
+
+        this.context.strokeStyle = "#000000";
+        this.context.beginPath();
+        this.context.arc(x, y, r, 0, 2 * Math.PI);
+        this.context.stroke();
+
+        x += l1 * Math.cos(this.aAngle(this.t));
+        y += l1 * Math.sin(this.aAngle(this.t));
+
+        this.context.strokeStyle = "#000000";
+        this.context.beginPath();
+        this.context.arc(x, y, r, 0, 2 * Math.PI);
+        this.context.stroke();
+
+        x += l2 * Math.cos(this.bAngle(this.t));
+        y += l2 * Math.sin(this.bAngle(this.t));
+
+        this.context.strokeStyle = "#000000";
         this.context.beginPath();
         this.context.arc(x, y, r, 0, 2 * Math.PI);
         this.context.stroke();
