@@ -1,0 +1,23 @@
+*
+{
+	margin: 0;
+	padding: 0;
+	/*background-color: rgba(0,255,0,0.1);*/
+}
+
+.clear
+{
+	clear: both;
+}
+
+.wrapper
+{
+	margin: 0 auto;
+	max-width: 1400px;
+	width: 100%;
+}
+
+.who_we_are_item
+{
+	float: left;
+}

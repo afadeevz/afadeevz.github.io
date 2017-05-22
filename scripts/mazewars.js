@@ -1,568 +1,533 @@
-/* To do list:
-   //-moveable objects
-   //-camera following objects
-   -mapSet drawing optimization
-   -make camera use controller
-   -fix camera positioning
-*/
-
 'use strict';
-
-var testMode = true;
 
 window.onload = function()
 {
-    window.game = new cGame(gameCanvas);
-    if (testMode)
-    {
-        window.game.test();
-        window.setTimeout(function(){window.game.start();}, 1000);
-    }
-    else
-        window.game.start();
+	let game = new cGame(gameCanvas);
+	game.start();
 }
 
-class cCounter
-{
-    constructor(expectedRate = null)
-    {
-        this.rate = expectedRate;
-        this.oldTime = null;
-    }
-
-    update()
-    {
-        let newTime = new Date();
-        if (this.oldTime == null)
-            this.oldTime = newTime;
-        else 
-        {
-            let d = newTime.getTime() - this.oldTime.getTime();
-            if (this.rate == null)
-                this.rate = 1000/d;
-            else
-                this.rate = (24*this.rate + 1000/d)/25;
-            this.oldTime = newTime;
-        }
-        
-    }
-}
-
-class cKeyboard
-{
-    constructor()
-    {
-        this.pressed = [];
-    }
-
-    update(e)
-    {  
-        if (e.type == "keypress" || e.type == "keydown")
-            this.pressed[e.code] = true;
-        else if (e.type == "keyup")
-            this.pressed[e.code] = false;
-        this.isPressed(e.code);
-    }
-
-    isPressed(keyCode)
-    {
-        if (this.pressed[keyCode] == undefined)
-            return false;
-        return this.pressed[keyCode];
-    }
-}
-
-function setTrueInterval(f, delay, counter = new cCounter(1000/delay))
-{
-    f();
-    counter.update();
-    window.setTimeout(function(){setTrueInterval(f, delay, counter)}, 2*delay - 1000/counter.rate);
-}
-
-/* Multiplication of 2 matrices with sizes MxN and NxL */
-function mMultiply(A, B, n)
-{
-    let C = [];
-    let m = A.length/n;
-    let l = B.length/n; 
-    for (let i = 0; i < m; i++)
-        for (let j = 0; j < l; j++)
-        {
-            C[l*i + j] = 0;
-            for (let k = 0; k < n; k++)
-                C[l*i + j] += A[n*i + k]*B[l*k + j];
-        }
-    return C;
-}
-
-class cTranformationMatrix
-{
-    constructor()   
-    {
-        this.matrix = [1, 0, 0,
-                       0, 1, 0,
-                       0, 0, 1];
-    }
-
-    translate(x, y) 
-    {
-        this.matrix = mMultiply([1, 0, x,
-                                 0, 1, y,
-                                 0, 0, 1], this.matrix, 3);
-    }
-
-    rotate(a)
-    {
-        this.matrix = mMultiply([Math.cos(a),-Math.sin(a), 0,
-                                 Math.sin(a), Math.cos(a), 0,
-                                 0,           0,           1], this.matrix, 3);
-    }
-
-    rotateP(a, x, y)
-    {
-        this.translate(-x, -y);
-        this.rotate(a);
-        this.translate(x, y);
-    }
-
-    scale(f)
-    {
-        this.matrix = mMultiply([f, 0, 0,
-                                 0, f, 0,
-                                 0, 0, 1], this.matrix, 3);
-    }
-
-    scaleP(f, x, y)
-    {
-        this.translate(-x, -y);
-        this.scale(f);
-        this.translate(x, y);
-    }
-
-    apply(context)
-    {
-        context.setTransform(this.matrix[0],this.matrix[3],this.matrix[1],this.matrix[4],this.matrix[2],this.matrix[5]);
-    }
-}
-
-class cCamera
-{
-    constructor(canvas)
-    {
-        this.canvas = canvas;
-        this.target = null;
-        this.reset(); 
-    }
-
-    reset()
-    {
-        this.x = 0;
-        this.y = 0;
-        this.a = 0;
-        this.zoomLevel = 0;
-        this.xPrev = 0;
-        this.yPrev = 0;
-        this.aPrev = 0;
-        this.vx = 0;
-        this.vy = 0;
-        this.matrix = new cTranformationMatrix();
-        // this.matrix.translate(this.canvas.width/2, this.canvas.height/2);
-    }
-
-    follow(object)
-    {
-    	this.target = object;
-    }
-
-    update()
-    {
-    	if (this.target)
-    	{
-            // this.reset();
-	    	this.x = this.target.x;
-	    	this.y = this.target.y;
-	    	this.a = this.target.a;
-            let f = 1.1**this.zoomLevel;
-            let fcos = f*Math.cos(this.a);
-            let fsin = f*Math.sin(this.a);
-            this.matrix.matrix = [fcos, fsin,-this.x*fcos - this.y*fsin + this.canvas.width/2 ,
-                                 -fsin, fcos, this.x*fsin - this.y*fcos + this.canvas.height/2,
-                                  0   , 0,    1                                               ]
-            // this.matrix.translate(-this.x, -this.y);
-            // this.matrix.rotateP(this.a, this.canvas.width/2, this.canvas.height/2);
-    	}
-    	else
-    	{
-    		this.translate(this.x - this.xPrev, this.y - this.yPrev);
-	        this.rotate(this.a - this.aPrev);
-	    	this.xPrev = this.x;
-	    	this.yPrev = this.y;
-	    	this.aPrev = this.a;
-    	}
-    }
-
-    translate(x, y)
-    {
-        this.x += x;
-        this.y += y;
-        this.matrix.translate(x, y);
-    }
-
-    rotate(a)
-    {
-        this.a += a;
-        this.matrix.rotateP(a, this.canvas.width/2, this.canvas.height/2);
-    }
-
-    zoom(e)
-    {
-        // let f;
-        if (e.wheelDelta > 0)
-            this.zoomLevel++;
-        else
-            this.zoomLevel--;
-        // this.matrix.scaleP(f, this.canvas.width/2, this.canvas.height/2);
-    }
-}
-
-class cTileSet
-{
-    constructor(context, imageFile, tileHeight, tileWidth = tileHeight)
-    {
-        var that = this;
-        this.context = context;
-        this.image = new Image();
-        this.image.src = imageFile;
-        this.tileHeight = tileHeight;
-        this.tileWidth = tileWidth;
-        this.tiles = [];
-        this.compiled = false;
-    }
-
-    compile()
-    {
-        if (this.image.complete)
-        {
-            let w = Math.floor(this.image.width/this.tileWidth);
-            let h = Math.floor(this.image.height/this.tileHeight);
-            for (let i = 0; i < h; i++)
-                for (let j = 0; j < w; j++)
-                    this.tiles[i*w + j] = {x: j*this.tileWidth, y: i*this.tileHeight};
-            console.log("cTileSet: " + this.image.src.substring(this.image.src.lastIndexOf('/')+1) + " is loaded");
-            this.compiled = true;
-            return true;
-        }
-        return false;
-    }
-
-    draw(id, x, y)
-    {
-        if (this.compiled || this.compile())
-            this.context.drawImage(this.image, 
-                              this.tiles[id].x, this.tiles[id].y, this.tileWidth, this.tileHeight,
-                              x,                y,                this.tileWidth, this.tileHeight);
-    }
-}
-
-class cMapSet
-{
-    constructor()
-    {
-        this.mapData    = null;
-        this.tileSet    = null;
-        this.tileSize   = null;
-        this.dimensions = {x: null, y: null};
-    }
-    
-    setTileSet(tileSet)
-    {
-        this.tileSet    = tileSet;
-        this.tileWidth  = tileSet.tileWidth;
-        this.tileHeight = tileSet.tileHeight;
-    }
-
-    setMapData(mapTiles, width, height)
-    {
-        this.dimensions.x = width;
-        this.dimensions.y = height;
-        this.mapData = [];
-        for (let i = 0; i < height; i++)
-        {
-            this.mapData[i] = [];
-            for (let j = 0; j < width; j++)
-                this.mapData[i][j] = mapTiles[i*height + j]
-        }
-    }
-
-    readMapData(mapDataFile)
-    {
-        console.log(window.location);
-    }
-
-    draw(matrix)
-    {
-        matrix.apply(this.tileSet.context);
-        let h = this.dimensions.y;
-        let w = this.dimensions.x;
-        for (let i = 0; i < h; i++)
-            for (let j = 0; j < w; j++)
-            {
-                let coords = mMultiply(matrix.matrix,[(j + 0.5)*this.tileWidth, (i + 0.5)*this.tileHeight, 1], 3);
-                if (-100 < coords[0] && coords[0] < 1500 && -100 < coords[1] && coords[1] < 1500)
-                    this.tileSet.draw(this.mapData[i][j], j*this.tileWidth, i*this.tileHeight);
-            }
-    }
-}
-
-class cAnimationSet extends cTileSet
-{
-    constructor(frames, context, imageFile, tileHeight, tileWidth = tileHeight)
-    {
-        super(context, imageFile, tileHeight, tileWidth);
-        this.frames = frames;
-        this.currentFrame = 0;
-        this.period = 15;
-        this.progress = 0;
-    }
-
-    setFrames(frames)
-    {
-        this.frames = frames;
-    }
-
-    advance()
-    {
-        this.progress = (this.progress + 1)%this.period;
-        if (this.progress == 0)
-            this.currentFrame = (this.currentFrame + 1)%this.frames.length; 
-    }
-
-    draw(x, y, a, camera)
-    {
-    	this.context.save();
-    	let M = new cTranformationMatrix();
-    	M.rotateP(a, x + this.tileWidth/2, y + this.tileHeight/2);
-        M.translate(-this.tileWidth/2, -this.tileHeight/2);
-    	M.matrix = mMultiply(camera.matrix.matrix, M.matrix, 3);
-    	M.apply(this.context);
-        super.draw(this.currentFrame, x, y);
-    	this.context.restore();
-    }
-}
-
-class cObject
-{
-    constructor()
-    {
-        this.x = 0;
-        this.y = 0;
-        this.a = 0;//-Math.PI/4;
-        this.vx = 1;
-        this.vy = 1;
-        this.va = 0;//.1;
-        this.animSet = null;
-        this.controller = null;
-    }
-
-    setAnimSet(animSet)
-    {
-        this.animSet = animSet;
-    }
-
-    setController(controller)
-    {
-    	this.controller = controller;
-    }
-
-    draw(camera)
-    {
-        this.animSet.draw(this.x, this.y, this.a, camera);
-    }
-
-    move()
-    {
-        if (this.controller)
-        {
-        	let ins = this.controller.instructions;
-
-            let cos = Math.cos(this.a);
-            let sin = Math.sin(this.a)
-            this.vx += 0.01*(-ins.x*cos + ins.y*sin);
-            this.vy += 0.01*(-ins.x*sin - ins.y*cos);
-        	this.va += 0.1*ins.a;
-        }
-        this.x += this.vx;
-        this.y += this.vy;
-        this.a += this.va;
-    }
-}
-
-class cHumanController
-{
-	constructor(keyboard)
-	{
-		this.keyboard = keyboard;
-	}
-
-	get instructions()
-	{
-		let x = 0, y = 0;
-        if (this.keyboard.isPressed("KeyW"))
-            y++;
-        if (this.keyboard.isPressed("KeyS"))
-            y--;
-        if (this.keyboard.isPressed("KeyA"))
-            x++;
-        if (this.keyboard.isPressed("KeyD"))
-            x--;
-        let a = 0;
-        if (this.keyboard.isPressed("KeyQ"))   
-        {
-            a -= Math.PI/900;
-        }
-        if (this.keyboard.isPressed("KeyE"))   
-        {
-            a += Math.PI/900;
-        }
-        return {x: x, y: y, a: a};
-	}
-}
 
 class cGame
 {
-    constructor(canvas)
-    {
-        console.log("Game: Initialization")
-        this.canvas = canvas;
-        this.context = canvas.getContext("2d");
-        this.UPS = 60;
-        this.FPSCounter = new cCounter(60);
-        this.UPSCounter = new cCounter(60);
-        this.keyboard = new cKeyboard();
-        this.camera = new cCamera(canvas);
-        this.resize();
-        let that = this;
-        window.addEventListener("mousewheel", function(e){that.camera.zoom(e);});
-        window.addEventListener("resize", function(){that.resize();});
-        ["keydown", "keypress", "keyup"].forEach(function(e){window.addEventListener(e, function(e){that.keyboard.update(e)});});
-    }
+	constructor(canvas)
+	{
+		this.setState("Start");
+		this.canvas = canvas;
+		this.context = canvas.getContext("2d");
+		let that = this;
+		window.addEventListener("resize", function(){that.resize();});
+		this.resize();
 
-    resize()
-    {
-        this.canvas.style.width = "100%";
-        let w = this.canvas.clientWidth;
-        let h = innerHeight;
-        this.canvas.style.height = h + "px";
-        this.canvas.height = h;
-        this.canvas.width = w;
-    }
+	}
 
-    drawFrame()
-    {
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.testMapSet.draw(this.camera.matrix);
-        this.camera.update();
-        this.ship.draw(this.camera);
-        this.ship.animSet.advance();
-        this.context.setTransform(1, 0, 0, 1, 0, 0);
-        let that = this;
-        this.FPSCounter.update();
-        if (testMode)
-        {
-            this.context.fillStyle = "red";
-            this.context.font = "48pt Arial";
-            this.context.fillText(Math.round(this.FPSCounter.rate), 10, 50);
-            this.context.fillText(Math.round(this.UPSCounter.rate), 10, 100);
-            this.context.font = "16pt Arial";
-            this.context.fillText("FPS", 80, 50);
-            this.context.fillText("UPS", 80, 100);
-        }
-        requestAnimationFrame(function(){that.drawFrame();});
-    }
+	resize()
+	{
+		let h = window.innerHeight;
+		let w = window.innerWidth;
+		this.canvas.style.height = h + 'px';
+		this.canvas.style.width  = w + 'px';
+		this.canvas.height = h;
+		this.canvas.width  = w;
+	}
 
-    test()
-    {
-        console.log("Game: Testing");
-        console.log("-tileSet");
-        this.testTileSet = new cTileSet(this.context, "scripts/data/test.png", 64);
-        this.shipAnimation = new cAnimationSet([0,1], this.context, "scripts/data/spaceship.png", 128, 64);
-        let that = this;
-        window.setTimeout(function()
-        {
-            that.testTileSet.draw(2, 42, 42);
-            console.log("-mapSet + camera");
-            that.camera.translate(250, 20);
-            that.camera.rotate(-Math.PI/4, 250, 20);
-            that.camera.matrix.apply(that.context);
-            that.testMapSet = new cMapSet();
-            that.testMapSet.setTileSet(that.testTileSet);
-            let size = 50;
-            let data = [];
-            for (let i = 0; i <= size**2; i++)
-                data[i] = i%3;
-            that.testMapSet.setMapData(data, size, size);
-            // let data = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            //             1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-            //             1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-            //             1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-            //             1, 0, 0, 0, 2, 2, 0, 0, 0, 1,
-            //             1, 0, 0, 0, 2, 2, 0, 0, 0, 1,
-            //             1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-            //             1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-            //             1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-            //             1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-            // that.testMapSet.setMapData(data, 10, 10);
-            that.testMapSet.draw(that.camera.matrix);
-            console.log("-object");
-            that.ship = new cObject();
-            that.ship.setAnimSet(that.shipAnimation);
-            that.ship.setController(new cHumanController(that.keyboard));
-            console.log(that.ship);
-            that.ship.draw(that.camera);
-            that.camera.reset();
-            that.camera.follow(that.ship);
-        },10);
-    }
+	setState(newState)
+	{
+		if (this.state)
+			console.log("State: [" + this.state + "] => [" + newState + "]");
+		else
+			console.log("State: [" + newState + "]");
+		this.state = newState;
+	}
 
-    start()
-    {
-        let that = this;
-        window.setTrueInterval(function(){that.tick();}, 1000/this.UPS);
-        requestAnimationFrame(function(){that.drawFrame();});
-    }
-
-    processKeyboard()
-    {
-        let dx = 0, dy = 0;
-        if (this.keyboard.isPressed("KeyW"))
-            dy++;
-        if (this.keyboard.isPressed("KeyS"))
-            dy--;
-        if (this.keyboard.isPressed("KeyA"))
-            dx++;
-        if (this.keyboard.isPressed("KeyD"))
-            dx--;
-        let ds = Math.hypot(dx,dy);
-        if (ds != 0)
-        {
-            dx *= 10/ds;
-            dy *= 10/ds;
-        }
-        let da = 0;
-        if (this.keyboard.isPressed("KeyQ"))   
-        {
-            da += Math.PI/90;
-        }
-        if (this.keyboard.isPressed("KeyE"))   
-        {
-            da -= Math.PI/90;
-        }
-    }
-
-    tick()
-    {
-        this.processKeyboard();
-        this.UPSCounter.update();
-        this.ship.move();
-    }
+	start()
+	{
+		this.setState("Load");
+		
+	}
 }
+
+/*
+//-------CONST-------//
+CONST cz0 = 25;
+      mpg = 200;
+      di     : array [0..3] of shortint = (0,-1,0,1);
+      dj     : array [0..3] of shortint = (1,0,-1,0);
+      dx     : array [0..3] of shortint = (cz0,cz0-1,0,1);
+      dy     : array [0..3] of shortint = (cz0-1,0,1,cz0);
+      opp    : array [0..3] of byte     = (2,3,0,1);
+      next   : array [0..3] of byte     = (1,2,3,0);
+      colors : array [0..5] of word     = (Black,Blue,Red,Green,Yellow,Cyan);
+      
+      NObjects = 3;
+      Spawner = 1;
+      Pointer = 2;
+      Mine    = 3;
+//-------CONST-------//
+
+//-------FIELD-------//
+TYPE TLocation = Record
+         t,f,p : integer;
+         w : array [0..3] of PBoolean
+     End;
+     TGlider = Record
+         fr,i1,j1,i2,j2,d1,d2 : integer;
+     End;
+     TGliderArray = array of TGlider;
+     TSpawner = Record
+         
+     End;
+     TField = array of array of TLocation;
+     
+Var F : TField;
+    G : TGliderArray;
+    m,n,cz,e : integer;
+    t : double;
+
+Function InField(i,j : integer) : boolean;
+Begin
+   InField:=(i in [0..m-1]) and (j in [0..n-1])
+End;
+
+Function TypeIs(t,i,j : integer) : boolean;
+Begin
+   TypeIs:=InField(i,j) and (F[i,j].t=-1)
+End;
+//-------FIELD-------//
+
+//-------INITIALIZATION-------//
+Procedure SetFieldSize(var F : TField; m,n : integer);
+Var i,j,ni,nj,d : integer;
+Begin
+   SetLength(F,m,n);
+   
+   for i:=0 to m-1 do 
+   for j:=0 to n-1 do begin
+      F[i,j].t:=0;
+      for d:=0 to 3 do
+      F[i,j].w[d]:=nil
+   end;
+   
+   for i:=0 to m-1 do
+   for j:=0 to n-1 do
+   for d:=0 to 3 do begin
+      ni:=i + di[d];
+	  nj:=j + dj[d];
+	  if not (InField(ni,nj)) then begin
+	     GetMem(F[i,j].w[d],1);
+	     F[i,j].w[d]^:=true
+	  end
+	  else if (F[i,j].w[d]=nil) then begin
+	     GetMem(F[i,j].w[d],1);
+	     F[ni,nj].w[opp[d]]:=F[i,j].w[d];
+	     F[i,j].w[d]^:=false
+	  end
+   end
+End;
+
+Procedure FillField(var F : TField; t : integer; bool : boolean);
+Var i,j,d,ni,nj : integer;
+Begin
+   for i:=0 to m-1 do
+   for j:=0 to n-1 do begin
+      F[i,j].t:=t;
+      for d:=0 to 3 do 
+      if ((F[i,j].w[d]^) xor (bool)) then begin
+         ni:=i + di[d];
+   	  nj:=j + dj[d];
+	     if InField(ni,nj) then
+   	  F[i,j].w[d]^:=bool
+      end
+   end
+End;
+
+Procedure UpdateSize(ncz : integer);
+Begin
+	cz:=ncz;//New cell size
+	m:=479 div cz;//Height
+	n:=639 div cz;//Width
+	SetFieldSize(F,m,n)
+End;
+
+Procedure Init;
+Var gm,gd : integer;
+Begin
+	Randomize;
+	gd:=detect;
+	//gm:=m1024x768;
+	InitGraph(gd,gm,'');
+	UpdateSize(cz0)
+End;
+//-------INITIALIZATION-------//
+
+//-------GRAPHICS-------//
+Procedure RenderDots;
+Var i,j : integer;
+Begin
+	for i:=0 to m do
+	for j:=0 to n do
+	PutPixel(cz*j,cz*i,LightGray)
+End;
+
+Procedure RenderWall(i,j,d : integer);
+Var x0,y0 : integer;
+Begin
+	if F[i,j].w[d]^ then
+	SetColor(LightGray)
+	else
+	SetColor(Black);
+	
+	x0:=j*cz + dx[d];
+	y0:=i*cz + dy[d];
+	
+	Line(x0, y0, x0 + dj[next[d]]*(cz-2), y0 + di[next[d]]*(cz-2))
+End;
+
+Procedure RenderCenter(i,j : integer);
+Var x0,y0 : integer;
+Begin
+	x0:=j*cz;
+	y0:=i*cz;
+	if (F[i,j].t=1) then begin
+		SetColor(Colors[F[i,j].f]);
+		Rectangle(x0+1+(cz-1) div 4,y0+1+(cz-1) div 4,x0+cz-1-(cz-1) div 4,y0+cz-1-(cz-1) div 4)
+	end;
+End;
+
+Procedure RenderLocation(i,j : integer);//redo
+Var d : integer;
+Begin
+	RenderCenter(i,j);
+	
+	for d:=0 to 3 do 
+	RenderWall(i,j,d)
+End;
+
+Procedure RenderField;
+Var i,j : integer;
+Begin
+	RenderDots;
+	for i:=0 to m-1 do
+	for j:=0 to n-1 do
+	RenderLocation(i,j)
+End;
+
+Procedure RenderGlider(i : integer;t : double);
+Var x,y,a : double;
+    x1,y1,x2,y2,x3,y3,a1,a2 : integer;
+Begin
+	with G[i] do begin
+		SetColor(Colors[fr]);
+		
+		x:=cz*(j1 + (j2-j1)*t + 0.5);
+		y:=cz*(i1 + (i2-i1)*t + 0.5);
+		if (d2-d1 > 2) then
+		a:=(d1 + (d2-4-d1)*t)*pi/2
+		else if (d1-d2 > 2) then
+		a:=(d1 + (d2-d1+4)*t)*pi/2
+		else
+		a:=(d1 + (d2-d1)*t)*pi/2
+	end;
+	
+	x1:=round(x + cz/3*cos(3*pi/4 + a));
+	y1:=round(y - cz/3*sin(3*pi/4 + a));
+	x2:=round(x + cz/3*cos(a));
+	y2:=round(y - cz/3*sin(a));
+	x3:=round(x + cz/3*cos(-3*pi/4 + a));
+	y3:=round(y - cz/3*sin(-3*pi/4 + a));
+	
+	Line(x1,y1,x2,y2);
+	Line(x3,y3,x2,y2);
+	Line(x1,y1,x3,y3);
+End;
+
+Procedure RenderGlider(i : integer);
+Begin
+	RenderGlider(i,t)
+End;
+
+Procedure RenderGliders;
+Var i : integer;
+Begin
+	for i:=0 to high(G) do 
+	RenderGlider(i)
+End;
+
+Procedure HideGlider(i : integer;t : double);
+Var fr : integer;
+Begin
+	fr:=G[i].fr;
+	G[i].fr:=0;
+	RenderGlider(i,t);
+	RenderCenter(G[i].i1,G[i].j1);
+	RenderCenter(G[i].i2,G[i].j2);
+	G[i].fr:=fr
+End;
+
+Procedure HideGlider(i : integer);
+Begin
+	HideGlider(i,t)
+End;
+
+Procedure HideGliders;
+Var i : integer;
+Begin
+	for i:=0 to high(G) do 
+	HideGlider(i)
+End;
+
+Procedure RenderAll(t : double);
+Begin
+	ClearDevice;
+	RenderField;
+	RenderGliders;
+End;
+//-------GRAPHICS-------//
+
+//-------MAP GENERATION-------//
+Procedure GenSpawners;
+Var i,j,d,c : integer;
+Begin
+   for i:=0 to m-1 do
+   for j:=0 to n-1 do begin
+      c:=0;
+      
+      for d:=0 to 3 do
+      if F[i,j].w[d]^ then
+      c+=1;
+      
+      if (c > 2) then
+      F[i,j].t:=Spawner;
+   end
+End;
+
+Procedure GenMazeBacktracking;
+Var i,j,ni,nj,d,c : integer;
+    st : TList;
+    data : TIntegerArray;
+Begin
+   FillField(F,-1,True);
+   InitList(st);
+   
+   i:=random(m);
+   j:=random(n);
+   
+   Repeat 
+      F[i,j].t:=0;
+      c:=0;
+      
+      for d:=0 to 3 do begin
+         ni:=i + di[d];
+         nj:=j + dj[d];
+         if TypeIs(-1,ni,nj) then
+         c+=1
+      end;
+      
+      if (c = 0) then begin
+         PopHead(st,PIntegerArray.create(@i,@j));
+      end
+      else begin
+         c:=random(c) + 1;
+         d:=-1;
+         
+         while (c > 0) do begin
+            d+=1;
+            ni:=i + di[d];
+            nj:=j + dj[d];
+            if TypeIs(-1,ni,nj) then
+            c-=1;
+         end;
+         
+         F[i,j].w[d]^:=false;
+         PushHead(st,TIntegerArray.create(i,j));
+         i:=ni;
+         j:=nj
+      end
+   Until (st.head = nil);
+   GenSpawners
+End;
+
+Procedure GMRD(i1,j1,i2,j2 : integer);
+Var i,j,i0,j0,c : integer;
+Begin
+   if ((i2>i1)and(j2>j1)) then begin
+      i0:=round(NormalDistribution(i1,i2-1));
+      j0:=round(NormalDistribution(j1,j2-1));
+      
+      for i:=i1 to i2 do
+      F[i,j0].w[0]^:=true;
+      for j:=j1 to j2 do
+      F[i0,j].w[3]^:=true;
+      
+      c:=random(4);
+      if (c in [0,1,3]) then F[i0,j1+random(j0-j1+1)].w[3]^:=false;
+      if (c in [0..2])  then F[i0,j0+1+random(j2-j0)].w[3]^:=false;
+      if (c in [1..3])  then F[i1+random(i0-i1+1),j0].w[0]^:=false;
+      if (c in [0,2,3]) then F[i0+1+random(i2-i0),j0].w[0]^:=false;
+      
+      GMRD(i1,j1,i0,j0);
+      GMRD(i1,j0+1,i0,j2);
+      GMRD(i0+1,j1,i2,j0);
+      GMRD(i0+1,j0+1,i2,j2)
+   end
+End;
+
+Procedure GenMazeRecursiveDivision;
+Begin
+	FillField(F,0,False);
+	GMRD(0,0,m-1,n-1);
+	GenSpawners
+End;
+//-------MAP GENERATION-------//
+
+//-------//
+Procedure Spawn(nBots : integer);
+Var i,j,s,c,k : integer;
+Begin
+	c:=0;
+	for i:=0 to m-1 do
+	for j:=0 to n-1 do begin
+		if (F[i,j].t = Spawner) then
+		c+=1;
+	end;
+	
+	for k:=1 to min(nBots,c) do begin
+		s:=1 + random(c);
+		i:=-1;
+		while ((i < m)and(s > 0)) do begin
+			i+=1;
+			j:=-1;
+			while ((j < n)and(s > 0)) do begin
+				j+=1;
+				if (F[i,j].t = Spawner) then
+				s-=1
+			end;
+		end;
+		F[i,j].f:=k;
+		RenderCenter(i,j);
+		c-=1
+	end
+End;
+
+Function NotEndOfGame : boolean;//undone
+Begin
+	NotEndOfGame:=true
+End;
+
+Procedure AddGlider(i,j,d,fr : integer);
+Var n : integer;
+Begin
+	n:=Length(G);
+	SetLength(G,n+1);
+	G[n].i1:=i;
+	G[n].i2:=i;
+	G[n].j1:=j;
+	G[n].j2:=j;
+	G[n].fr:=fr;
+	G[n].d1:=d;
+	G[n].d2:=d;
+End;
+
+Procedure DeleteGlider(i : integer);
+Begin
+	HideGlider(i);
+	G[i]:=G[High(G)];
+	SetLength(G,Length(G)-1)
+End;
+
+Procedure Move;//shitcode
+Var i,j,d,c : integer;
+Begin
+	for i:=0 to m-1 do 
+	for j:=0 to n-1 do
+	if (((i+j) mod 2 = e)and(F[i,j].t=Spawner)and(F[i,j].f<>0)) then begin
+		F[i,j].p-=2;
+		if (F[i,j].p<=0) then begin
+			AddGlider(i,j,0,F[i,j].f);
+			F[i,j].p+=mpg
+		end;
+	end;
+	
+	i:=1;
+	while (i<=High(G)) do begin
+		j:=0;
+		while (j<i) do begin
+			if ((G[i].i2 = G[j].i2)and(G[i].j2 = G[j].j2)and(G[i].fr <> G[j].fr)) then begin
+				DeleteGlider(i);
+				DeleteGlider(j)
+			end;
+			j+=1
+		end;
+		i+=1
+	end;
+	
+	i:=0;
+	while (i<=High(G)) do with G[i] do begin
+		if ((F[i2,j2].f<>fr)and(F[i2,j2].t=Spawner)) then begin
+			F[i2,j2].f:=fr;
+			DeleteGlider(i)
+		end;
+		i+=1
+	end;
+	
+	for i:=0 to High(G) do with G[i] do begin
+		if (F[i1,j1].w[d1]^) then repeat
+		    d1:=(d1 + 1) mod 4;
+		    d2:=d1
+		until (not F[i1,j1].w[d1]^);
+		i1:=i2;
+		j1:=j2;
+		d1:=d2;
+		i2:=i1+di[d1];
+		j2:=j1+dj[d1];
+		
+		{if (not F[i2,j2].w[(d1+3) mod 4]^) then
+		d2:=(d1+3) mod 4
+		else 
+		if (F[i2,j2].w[d1]^) then begin
+		if (not F[i2,j2].w[(d1+1) mod 4]^) then
+		d2:=(d1+1) mod 4
+		else 
+		d2:=opp[d1]
+		end}
+		
+		c:=0;
+		for d:=0 to 3 do
+		if (not F[i2,j2].w[d]^) then
+		c+=1;
+		
+		if (c=1) then 
+		d2:=opp[d1]
+		else repeat
+			d2:=random(4)
+		until ((not F[i2,j2].w[d2]^)and(d2<>opp[d1]))
+	end
+End;
+
+Procedure StartGame(nBots : byte; Player : boolean);
+Var i,j : integer;
+    t0 : double;
+Begin
+	GenMazeRecursiveDivision;
+	RenderField;
+	Spawn(nBots);
+	while (NotEndOfGame) do begin
+		e:=(e + 1) mod 2;
+		t0 := 0;
+		for i:=1 to fpm do begin
+			t := i/fpm;
+			for j:=0 to High(G) do Begin
+				HideGlider(j,t0);
+				RenderGlider(j,t)
+			End;
+			t0 := t
+		end;
+		Move
+	end
+End;
+//---------//
+
+BEGIN
+   Init;
+   StartGame(5,false)
+END.
+*/

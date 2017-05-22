@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Leg Movement</title>
+  <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+  <meta charset="utf-8">
+  <link rel="stylesheet" type="text/css" href="styles/legmovement.css">
+  <script async src="scripts/legmovement.js"></script>
+</head>
+
+<body>
+  <div class="wrapper">
+    <div class="editor">
+      <h2>Параметры:</h2>
+      <div class="input">
+        <p class="inputName">l<sub>1</sub></p>
+        = <input id="lUp" class="textInputSmall" type="text" value="1">
+        <div class="clearfix"></div>
+      </div>
+      <div class="input">
+        <p class="inputName">l<sub>2</sub></p>
+        = <input id="lDown" class="textInputSmall" type="text" value="1">
+        <div class="clearfix"></div>
+      </div>
+      <div class="clearfix"></div>
+      <div class="input">
+        <p class="inputName">a<sub>0</sub></p>
+        = <input id="aStart" class="textInputSmall" type="text" value="0">
+      </div>
+      <div class="input">
+        <p class="inputName">a(t)</p>
+        = <input id="at" type="text" value="sin(t)">
+        <select id="aAngleUnit">
+          <option value="rad">Рад</option>
+          <option value="grad">Град</option>
+        </select>
+      </div>
+      <div class="input">
+        <input id="aInverted" type="checkbox"> Инвертировать угол a
+      </div>
+      <div class="clearfix"></div>
+      <div class="input">
+        <p class="inputName">b<sub>0</sub></p>
+        = <input id="bStart" class="textInputSmall" type="text" value="0">
+      </div>
+      <div class="input">
+        <p class="inputName">b(t)</p>
+        = <input id="bt" type="text" value="sin(t/2)">
+        <select id="bAngleUnit">
+          <option value="rad">Рад</option>
+          <option value="grad">Град</option>
+        </select>
+      </div>
+      <div class="input">
+        <input id="bInverted" type="checkbox"> Инвертировать угол b
+      </div>
+      <div class="clearfix"></div>
+      <div class="input">
+        <input id="bRelative" type="checkbox"> Угол b по отношению к верхнему звену
+      </div>
+      <div class="clearfix"></div>
+      <div class="input">
+        <p class="inputName">t<sub>0</sub></p>
+        = <input id="tStart" class="textInputSmall" type="text" value="0">
+        <div class="clearfix"></div>
+      </div>
+      <div class="input">
+        <p class="inputName">t<sub>к</sub></p>
+        = <input id="tFinish" class="textInputSmall" type="text">
+        <div class="clearfix"></div>
+      </div>
+    </div>
+    <canvas id="drawerCanvas" class="drawerCanvas">Ваш браузер не поддерживает canvas.</canvas>
+    <div class="clearfix"></div>
+  </div>
+</body>
+
+</html>

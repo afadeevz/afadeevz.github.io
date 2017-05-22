@@ -1,0 +1,52 @@
+html,
+body {
+    padding: 0;
+    margin: 0;
+}
+
+.wrapper,
+.editor,
+.drawerCanvas {
+    background-color: rgba(0, 255, 32, .1);
+}
+
+.clearfix {
+    clear: both;
+}
+
+.wrapper {
+    margin: 0 auto;
+    padding: 16px 32px;
+    width: auto;
+    max-width: 1400px;
+}
+
+.editor {
+    width: auto;
+    float: left;
+    margin: 16px 5%;
+    padding: 16px;
+}
+
+.input {
+    margin: 4px;
+    float: left;
+}
+
+.inputName {
+    min-width: 32px;
+    margin: 0;
+    float: left;
+}
+
+.textInputSmall {
+    width: 50px;
+}
+
+.drawerCanvas {
+    width: 90%;
+    height: 640px;
+    box-sizing: border-box;
+    margin: 16px 5%;
+    border: 1px solid rgba(0, 0, 0, .1);
+}
