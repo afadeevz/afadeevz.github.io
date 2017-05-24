@@ -1,0 +1,28 @@
+html,
+body {
+    padding: 0;
+    margin: 0;
+}
+
+.wrapper {
+    width: 90%;
+    max-width: 1400px;
+    margin: 0 5%;
+    text-align: center;
+}
+
+.canvas {
+    display: inline-block;
+    width: 100%;
+    max-width: 640px;
+    margin: 15px auto;
+}
+
+.clearfix {
+    clear: both;
+}
+
+.footer {
+    display: inline-block;
+    margin: 15px auto;
+}

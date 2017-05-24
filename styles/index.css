@@ -1,23 +1,34 @@
-.clear
-{
+html,
+body {
+    padding: 0;
+    margin: 0;
+}
+
+.clear {
     clear: both;
 }
 
-body
-{
-    text-align: center;
-}
-
-.wrapper
-{
-    display: inline-block;
+.wrapper {
     max-width: 600px;
     margin: 0 auto;
+    padding: 30px;
+    font-family: 'Roboto', Serif;
+    text-align: center;
+    border: 1px solid black;
+    background-color: ghostwhite;
 }
 
-.link
-{
-    float: left;
+.link {
+    display: inline-block;
     width: auto;
-    margin: 0 20px;
+    margin: 0 auto;
+    padding: 10px 20px;
+}
+
+.wip {
+    color: gray;
+}
+
+.released {
+    color: darkgreen;
 }

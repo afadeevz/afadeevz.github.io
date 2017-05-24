@@ -1,3 +1,5 @@
+'use strict';
+
 function drawLine(context, x1, y1, x2, y2, c) {
     context.strokeStyle = c;
     context.beginPath();
