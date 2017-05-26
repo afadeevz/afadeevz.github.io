@@ -21,7 +21,7 @@ body {
 
 .editor,
 .drawerCanvas,
-.graphCanvas {
+.plotCanvas {
     background-color: #DDDDDD;
 }
 
@@ -48,7 +48,7 @@ body {
 }
 
 .drawerCanvas,
-.graphCanvas {
+.plotCanvas {
     width: 90%;
     height: 45%;
     box-sizing: border-box;

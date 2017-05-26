@@ -24,40 +24,77 @@
         <div class="clearfix"></div>
       </div>
       <div class="clearfix"></div>
+
       <div class="input">
-        <p class="inputName">Начальное значение угла α — α<sub>0</sub></p>
-        = <input id="aStart" class="textInputSmall" type="text" value="-0.12">
+        <p class="inputName">Начальное значение угла α<sub>1</sub> — α<sub>1н</sub></p>
+        = <input id="a1Start" class="textInputSmall" type="text" value="-0.12">
       </div>
       <div class="input">
-        <p class="inputName">Добавочное значение угла α — f(t)</p>
-        = <input id="at" type="text" value="-0.198+4.546*t-17.540*t^2+45.266*t^3-53.113*t^4+5.413*t^5">
-        <select id="aAngleUnit">
+        <p class="inputName">Добавочное значение угла α<sub>1</sub> — f<sub>1</sub>(t)</p>
+        = <input id="f1" type="text" value="-0.198+4.546*t-17.540*t^2+45.266*t^3-53.113*t^4+5.413*t^5">
+        <select id="a1AngleUnit">
           <option value="rad">Рад</option>
           <option value="grad">Град</option>
         </select>
       </div>
       <div class="input">
-        <input id="aInverted" type="checkbox"> Инвертировать угол α
+        <input id="a1Inverted" type="checkbox"> Инвертировать угол α<sub>1</sub>
       </div>
       <div class="clearfix"></div>
+
       <div class="input">
-        <p class="inputName">Начальное значение угла β — β<sub>0</sub></p>
-        = <input id="bStart" class="textInputSmall" type="text" value="-0.12">
+        <p class="inputName">Начальное значение угла β<sub>1</sub> — β<sub>1н</sub></p>
+        = <input id="b1Start" class="textInputSmall" type="text" value="-0.12">
       </div>
       <div class="input">
-        <p class="inputName">Добавочное значение угла β — g(t)</p>
-        = <input id="bt" type="text" value="-0.198-3.036*t+18.534*t^2-38.374*t^3+30.526*t^4+5.413*t^5">
-        <select id="bAngleUnit">
+        <p class="inputName">Добавочное значение угла β<sub>1</sub> — g<sub>1</sub>(t)</p>
+        = <input id="g1" type="text" value="-0.198-3.036*t+18.534*t^2-38.374*t^3+30.526*t^4+5.413*t^5">
+        <select id="b1AngleUnit">
           <option value="rad">Рад</option>
           <option value="grad">Град</option>
         </select>
       </div>
       <div class="input">
-        <input id="bInverted" type="checkbox"> Инвертировать угол β
+        <input id="b1Inverted" type="checkbox"> Инвертировать угол β<sub>1</sub>
       </div>
       <div class="clearfix"></div>
+
       <div class="input">
-        <input id="bRelative" type="checkbox"> Угол β по отношению к верхнему колену
+        <p class="inputName">Начальное значение угла α<sub>2</sub> — α<sub>2н</sub></p>
+        = <input id="a2Start" class="textInputSmall" type="text" value="-0.12">
+      </div>
+      <div class="input">
+        <p class="inputName">Добавочное значение угла α<sub>2</sub> — f<sub>2</sub>(t)</p>
+        = <input id="f2" type="text" value="-0.198+4.546*t-17.540*t^2+45.266*t^3-53.113*t^4+5.413*t^5">
+        <select id="a2AngleUnit">
+          <option value="rad">Рад</option>
+          <option value="grad">Град</option>
+        </select>
+      </div>
+      <div class="input">
+        <input id="a2Inverted" type="checkbox"> Инвертировать угол α<sub>2</sub>
+      </div>
+      <div class="clearfix"></div>
+
+      <div class="input">
+        <p class="inputName">Начальное значение угла β<sub>2</sub> — β<sub>2н</sub></p>
+        = <input id="b2Start" class="textInputSmall" type="text" value="-0.12">
+      </div>
+      <div class="input">
+        <p class="inputName">Добавочное значение угла β<sub>2</sub> — g<sub>2</sub>(t)</p>
+        = <input id="g2" type="text" value="-0.198-3.036*t+18.534*t^2-38.374*t^3+30.526*t^4+5.413*t^5">
+        <select id="b2AngleUnit">
+          <option value="rad">Рад</option>
+          <option value="grad">Град</option>
+        </select>
+      </div>
+      <div class="input">
+        <input id="b2Inverted" type="checkbox"> Инвертировать угол β<sub>2</sub>
+      </div>
+      <div class="clearfix"></div>
+
+      <div class="input">
+        <input id="bRelative" type="checkbox"> Углы β по отношению к верхнему колену
       </div>
       <div class="clearfix"></div>
       <div class="input">
@@ -70,15 +107,10 @@
         = <input id="tFinish" class="textInputSmall" type="text" value="0.5">
         <div class="clearfix"></div>
       </div>
-      <div class="input">
-        <p class="inputName">Смещение по времени для второй ноги — Δt</p>
-        = <input id="dt" class="textInputSmall" type="text" value="0.25">
-        <div class="clearfix"></div>
-      </div>
     </div>
     <canvas id="drawerCanvas" class="drawerCanvas">Ваш браузер не поддерживает canvas.</canvas>
-    <canvas id="graphCanvas" class="graphCanvas"></canvas>
     <div class="clearfix"></div>
+    <canvas id="plotCanvas" class="plotCanvas"></canvas>
   </div>
 </body>
 
