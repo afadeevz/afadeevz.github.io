@@ -46,12 +46,11 @@ function getMax(f, low, high) {
 
 class Leg {
 
-  constructor(canvas, c1, c2, c3) {
+  constructor(canvas, c1, c2) {
     this.canvas = canvas;
     this.context = canvas.getContext("2d");
     this.c1 = c1;
     this.c2 = c2;
-    this.c3 = c3;
   }
 
   setState(aAngle, bAngle) {
@@ -107,12 +106,12 @@ class Leg {
     this.context.lineWidth = 3;
 
     drawLine(this.context, x1, y1, x2, y2, this.c1);
-    drawLine(this.context, x2, y2, x3, y3, this.c2);
-    drawLine(this.context, x3, y3, x4, y4, this.c2);
+    drawLine(this.context, x2, y2, x3, y3, this.c1);
+    drawLine(this.context, x3, y3, x4, y4, this.c1);
 
-    drawCircle(this.context, x1, y1, r, this.c3);
-    drawCircle(this.context, x2, y2, r, this.c3);
-    drawCircle(this.context, x3, y3, r, this.c3);
+    drawCircle(this.context, x1, y1, r, this.c2);
+    drawCircle(this.context, x2, y2, r, this.c2);
+    drawCircle(this.context, x3, y3, r, this.c2);
   }
 }
 
@@ -316,8 +315,8 @@ class Drawer {
   constructor(drawerCanvas, plotCanvas) {
     this.canvas = drawerCanvas;
     this.context = this.canvas.getContext("2d");
-    this.legFront = new Leg(this.canvas, "#EE0000", "#00EE00", "#000000");
-    this.legBack = new Leg(this.canvas, "#EE7777", "#77EE77", "#777777");
+    this.legFront = new Leg(this.canvas, "#00EE00", "#000000");
+    this.legBack = new Leg(this.canvas, "#EE0000", "#000000");
     this.plotCanvas = plotCanvas;
     this.plotContext = plotCanvas.getContext("2d");
     this.update();
@@ -338,15 +337,13 @@ class Drawer {
     this.legFront.draw(this.a1Angle(this.t), this.b1Angle(this.t), height);
   }
 
-  drawPlot(context, x, y, w, h, f, low, high, axisAbscissa, axisOrdinate) {
-    let min = getMin(f, low, high);
-    let max = getMax(f, low, high);
-
+  drawGraph(context, x, y, w, h, f, low, high, min, max) {
+    context.strokeStyle = "#000000";
     context.beginPath();
     for (let arg = low; arg <= high; arg += (high - low) / 256) {
       let val = f(arg);
       let X = x + w * (arg - low) / (high - low);
-      let Y = y + h * (val - min) / (max - min);
+      let Y = y + h * (max - val) / (max - min);
       if (arg == low) {
         context.moveTo(X, Y);
       } else {
@@ -354,7 +351,49 @@ class Drawer {
       }
     }
     context.stroke();
+  }
 
+  drawAbscissaAxis(context, x, y, w, h, low, high, min, max, abscissaAxisName) {
+    context.strokeStyle = "#555555";
+    context.beginPath();
+    let X = x - w * 0.1;
+    let Y = y + h * (max - 0) / (max - min);
+    context.moveTo(X, Y);
+    X += w * 1.2;
+    context.lineTo(X, Y);
+    X -= 20;
+    Y -= 10;
+    context.lineTo(X, Y);
+    X += 20;
+    Y += 10;
+    context.lineTo(X, Y);
+    X -= 20;
+    Y += 10;
+    context.lineTo(X, Y);
+    context.stroke();
+    Y += 20;
+    X += 15;
+    context.font = "25px Verdana";
+    context.textAlign = "right";
+    this.context.textBaseline = "top";
+    context.fillText(abscissaAxisName, X, Y);
+    X -= w * 0.1 - 5;
+    context.beginPath();
+    Y -= 40;
+    context.moveTo(X, Y);
+    Y += 20;
+    context.lineTo(X, Y);
+    context.stroke();
+    context.textAlign = "center";
+    Y += 20;
+    context.fillText(parseFloat(high.toFixed(2)), X, Y);
+    X -= w - 5;
+    context.textAlign = "left";
+    context.fillText(parseFloat(low.toFixed(2)), X, Y);
+  }
+
+  drawOrdinateAxis(context, x, y, h, ordinateAxisName) {
+    context.strokeStyle = "#555555";
     context.beginPath();
     let X = x;
     let Y = y + h * 1.1;
@@ -375,30 +414,16 @@ class Drawer {
     context.font = "25px Verdana";
     context.textAlign = "right";
     this.context.textBaseline = "middle";
-    context.fillText(axisOrdinate, X, Y);
+    context.fillText(ordinateAxisName, X, Y);
+  }
 
-    context.beginPath();
-    X = x - w * 0.1;
-    Y = y + h * (0 - min) / (max - min);
-    context.moveTo(X, Y);
-    X += w * 1.2;
-    context.lineTo(X, Y);
-    X -= 20;
-    Y -= 10;
-    context.lineTo(X, Y);
-    X += 20;
-    Y += 10;
-    context.lineTo(X, Y);
-    X -= 20;
-    Y += 10;
-    context.lineTo(X, Y);
-    context.stroke();
-    Y += 20;
-    X += 15;
-    context.textAlign = "right";
-    this.context.textBaseline = "top";
-    context.fillText(axisAbscissa, X, Y);
+  drawPlot(context, x, y, w, h, f, low, high, abscissaAxisName, ordinateAxisName) {
+    let min = getMin(f, low, high);
+    let max = getMax(f, low, high);
 
+    this.drawAbscissaAxis(context, x, y, w, h, low, high, min, max, abscissaAxisName);
+    this.drawOrdinateAxis(context, x, y, h, ordinateAxisName);
+    this.drawGraph(context, x, y, w, h, f, low, high, min, max);
   }
 
   drawPlots() {
@@ -412,11 +437,18 @@ class Drawer {
     let canvas = this.plotCanvas;
     let h = canvas.height;
     let w = canvas.width;
-    let x = [w / 20, 11 * w / 20, w / 20, 11 * w / 20];
-    let y = [h / 20, h / 20, 11 * h / 20, 11 * h / 20];
+    let x = [w / 20, w * 11 / 20, w / 20, w * 11 / 20];
+    let y = [h / 20, h / 20, h * 11 / 20, h * 11 / 20];
+    let lowerBound = this.t0;
+    let upperBound = this.tf;
+    if (!isFinite(upperBound)) {
+      upperBound = 10;
+    }
+    if (upperBound == lowerBound)
+      upperBound += 1;
     this.plotContext.clearRect(0, 0, w, h);
     for (let i = 0; i < 4; i++) {
-      this.drawPlot(this.plotContext, x[i], y[i], 2 * w / 5, 2 * h / 5, functions[i], this.t0, this.tf, 't', names[i]);
+      this.drawPlot(this.plotContext, x[i], y[i], 2 * w / 5, 2 * h / 5, functions[i], lowerBound, upperBound, 't', names[i]);
     }
   }
 
@@ -426,9 +458,10 @@ class Drawer {
 
     this.draw();
 
-    this.t += 1 / 60;
+    this.t += 1 / 600;
     if (this.t > this.tf) {
-      this.t += this.t0 - this.tf;
+      this.t = this.t0;
+      console.log('!');
     }
     window.requestAnimationFrame(() => { this.tick() });
   }
