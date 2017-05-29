@@ -50,7 +50,6 @@ body {
 .drawerCanvas,
 .plotCanvas {
     width: 90%;
-    height: 45%;
     box-sizing: border-box;
     margin: 16px 5%;
     border: 1px solid rgba(0, 0, 0, .1);
