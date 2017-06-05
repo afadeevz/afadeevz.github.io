@@ -490,7 +490,9 @@ class Drawer {
     this.t += 1 / 60;
     if (this.t > this.tf) {
       this.t = this.t0;
-      console.log('!');
+      let tmp = this.legFront;
+      this.legFront = this.legBack;
+      this.legBack = tmp;
     }
     window.requestAnimationFrame(() => { this.tick() });
   }

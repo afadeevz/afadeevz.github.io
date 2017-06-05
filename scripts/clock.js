@@ -7,6 +7,20 @@ class Clock {
     this.dimensions = null;
     this.resize();
     window.addEventListener("resize", (e) => { this.resize(); });
+    this.mouseOver = false;
+    this.mousePressed = false;
+    this.initializeMouseEvents();
+  }
+
+  initializeMouseEvents() {
+    this.canvas.addEventListener("mousedown", () => { this.mousePressed = true; });
+    this.canvas.addEventListener("mouseup", () => { this.mousePressed = false; });
+    this.canvas.addEventListener("mouseover", () => { this.mouseOver = true; });
+    this.canvas.addEventListener("mouseout", () => { this.mouseOver = false; });
+  }
+
+  get isPaused() {
+    return (this.mousePressed && this.mouseOver);
   }
 
   resize() {
@@ -15,35 +29,39 @@ class Clock {
     this.canvas.style.height = d + "px";
     this.canvas.height = d;
     this.dimensions = d;
+    this.center = new Vec2(d / 2, d / 2);
     this.draw(new Date());
   }
 
-  drawFace() {
-    let d = this.dimensions;
-    let x = d / 2;
-    let y = d / 2;
-    let r = d / 2 - 5;
+  vec2FromPolar(length, angle, center = new Vec2(0, 0)) {
+    let x = length * Math.cos(angle);
+    let y = length * Math.sin(-angle);
+    return center.add(new Vec2(x, y), true);
+  }
 
+  drawFace() {
     this.context.lineWidth = 3;
     this.context.strokeStyle = "#000000";
     this.context.fillStyle = "#000000"
 
+    let radius = this.dimensions / 2 - 5;
     this.context.beginPath();
-    this.context.arc(x, y, r, 0, 2 * Math.PI);
+    this.context.arc(this.center.x, this.center.y, radius, 0, 2 * Math.PI);
     this.context.stroke();
+
+    let x, y;
 
     this.context.lineWidth = 1;
     for (let i = 0; i < 60; i++) {
       let angle = Math.PI / 2 - i / 60 * 2 * Math.PI;
-      x = d / 2 + (d / 2 - 20) * Math.cos(angle);
-      y = d / 2 - (d / 2 - 20) * Math.sin(angle);
-      if (i % 5) {
-        r = 1;
-      } else {
-        r = 3;
+      let radius = this.dimensions / 2 - 20;
+      let pos = this.vec2FromPolar(radius, angle, this.center);
+      let dotRadius = 1;
+      if (i % 5 == 0) {
+        dotRadius = 3;
       }
       this.context.beginPath();
-      this.context.arc(x, y, r, 0, 2 * Math.PI);
+      this.context.arc(pos.x, pos.y, dotRadius, 0, 2 * Math.PI);
       this.context.fill();
       this.context.stroke();
     }
@@ -54,9 +72,9 @@ class Clock {
     let romanNumerals = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
     for (let i = 1; i <= 12; i++) {
       let angle = Math.PI / 2 - i / 12 * 2 * Math.PI;
-      x = d / 2 + (d / 2 - 55) * Math.cos(angle);
-      y = d / 2 - (d / 2 - 55) * Math.sin(angle);
-      this.context.fillText(romanNumerals[i - 1], x, y);
+      let radius = this.dimensions / 2 - 55;
+      let pos = this.vec2FromPolar(radius, angle, this.center);
+      this.context.fillText(romanNumerals[i - 1], pos.x, pos.y);
     }
   }
 
@@ -65,12 +83,10 @@ class Clock {
     this.context.lineWidth = params.width;
     this.context.strokeStyle = params.color;
     this.context.beginPath();
-    let x = d / 2 - 25 * Math.cos(params.angle);
-    let y = d / 2 + 25 * Math.sin(params.angle);
-    this.context.moveTo(x, y);
-    x = d / 2 + params.length * Math.cos(params.angle);
-    y = d / 2 - params.length * Math.sin(params.angle);
-    this.context.lineTo(x, y);
+    let pos = this.vec2FromPolar(-25, params.angle, this.center);
+    this.context.moveTo(pos.x, pos.y);
+    pos = this.vec2FromPolar(params.length, params.angle, this.center);
+    this.context.lineTo(pos.x, pos.y);
     this.context.stroke();
 
   }
@@ -108,17 +124,22 @@ class Clock {
 
     this.context.strokeStyle = "#000000";
     this.context.beginPath();
-    this.context.arc(d / 2, d / 2, 10, 0, 2 * Math.PI);
+    this.context.arc(this.center.x, this.center.y, 10, 0, 2 * Math.PI);
     this.context.fill();
     this.context.stroke();
   }
 
+  get time() {
+    return new Date();
+  }
+
   tick() {
-    let time = new Date();
-    this.draw(time);
+    if (!this.isPaused) {
+      this.draw(this.time);
+    }
     window.setTimeout(() => {
-      window.requestAnimationFrame(() => { this.tick() });
-    }, 1000 - time.getMilliseconds());
+      window.requestAnimationFrame(() => { this.tick(); });
+    }, 1000 - this.time.getMilliseconds());
   }
 
   start() {
