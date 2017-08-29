@@ -1,0 +1,12 @@
+textures: sprites_2.png
+lamp/anim_off/0.png	0	0	57	66	36	31	128	128	
+lamp/anim_on/0.png	57	0	57	66	36	31	128	128	
+tiles/wall.png	0	66	48	48	0	0	48	48	
+tiles/background.png	48	66	48	48	0	0	48	48	
+character/anim_jump/0.png	96	66	20	47	7	17	32	64	
+plate/anim_on/0.png	0	114	64	9	0	7	64	16	
+character/anim_walk/1.png	116	0	11	46	10	18	32	64	
+character/anim_walk/4.png	116	46	11	46	10	18	32	64	
+tiles/spikes.png	64	114	30	14	1	18	32	32	
+character/anim_dead/01.png	94	114	29	8	3	56	32	64	
+character/anim_dmg_air/12.png	116	92	6	16	0	46	32	64	

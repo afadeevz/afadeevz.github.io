@@ -1,104 +1,299 @@
-var x, y, mouseX, mouseY, mouseOver, mousePressed, Vx = 0,
-  Vy = 0,
-  r = 50,
-  w = 1920,
-  h = 1080;
-const UPS = 60,
-  dt = 1 / UPS;
+'use strict';
 
-function initialize() {
-  addEventListener("resize", updateSize);
-  ["mousemove", "touchstart", "touchmove"].forEach(function(e) { game_area.addEventListener(e, updateMousePosition); });
-  ["mousedown", "touchstart"].forEach(function(e) { game_area.addEventListener(e, function() { mousePressed = true; }); });
-  ["mouseup", "touchend"].forEach(function(e) { window.addEventListener(e, function() { mousePressed = false; }); });
-  ["mouseover"].forEach(function(e) { game_area.addEventListener(e, function() { mouseOver = true; }); });
-  ["mouseout"].forEach(function(e) { game_area.addEventListener(e, function() { mouseOver = false; }); });
+class Vector {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
 
-  updateSize();
-  game_area.width = w;
-  game_area.height = h;
-  mouseX = game_area.width / 2;
-  mouseY = game_area.height / 2;
-  x = game_area.width / 2;
-  y = game_area.height / 2;
+    get length() {
+        return Math.hypot(this.x, this.y);
+    }
 
-  let context = game_area.getContext("2d");
-  context.font = "64pt Serif"
-  context.fillText("Press mouse button or\ntouch the screen to move the ball", 10, 100);
-  1
-  window.setTimeout(function() { window.setInterval(gameTick, 1000 / UPS); }, 1500);
+    add(vector) {
+        return new Vector(this.x + vector.x, this.y + vector.y);
+    }
+
+    multiply(value) {
+        return new Vector(this.x * value, this.y * value)
+    }
+
+    negate(value) {
+        return this.multiply(-1);
+    }
+
+    normalize() {
+        const length = this.length;
+        if (length) {
+            this.x /= length;
+            this.y /= length;
+        }
+    }
 }
 
-function updateSize() {
-  game_area.style.width = "100%";
-  let h = game_area.clientWidth * 9 / 16;
-  game_area.style.height = h + "px";
-  if (h > window.innerHeight - 70) {
-    h = window.innerHeight - 70;
-    game_area.style.height = h + "px";
-    game_area.style.width = h * 16 / 9 + "px";
-  }
+class Mouse {
+    constructor(element) {
+        if (element) {
+            this.element = element;
+        } else {
+            this.element = window.document;
+        }
+        this.position = new Vector(null, null);
+        this.mouseOver = false;
+        this.mousePressed = false;
+
+        ["mousemove", "touchstart", "touchmove"].forEach((eventType) => {
+            this.element.addEventListener(eventType, this.update.bind(this));
+        });
+        ["mousedown", "touchstart"].forEach((eventType) => {
+            this.element.addEventListener(eventType, () => {
+                this.mousePressed = true;
+            });
+        });
+        ["mouseup", "touchend"].forEach((eventType) => {
+            window.addEventListener(eventType, () => {
+                this.mousePressed = false;
+            });
+        });
+        this.element.addEventListener("mouseover", () => {
+            this.mouseOver = true;
+        });
+        this.element.addEventListener("mouseout", () => {
+            this.mouseOver = false;
+        });
+    }
+
+    update(event) {
+        let b = this.element.getBoundingClientRect();
+        const w = this.element.clientWidth;
+        const h = this.element.clientHeight;
+        if (event.touches) {
+            const x = (event.touches[0].clientX - b.left) / w * 16 / 9;
+            const y = (event.touches[0].clientY - b.top) / h;
+            if (x < 0 || x > w || y < 0 || y > h) {
+                mouseOver = false;
+            } else {
+                mouseOver = true;
+            }
+            this.position.x = x;
+            this.position.y = y;
+        } else {
+            this.position.x = (event.clientX - b.left) / w * 16 / 9;
+            this.position.y = (event.clientY - b.top) / h;
+        }
+    }
+
+    get isActive() {
+        return (this.mousePressed && this.mouseOver);
+    }
 }
 
-function updateMousePosition(p) {
-  b = game_area.getBoundingClientRect();
-  if (!p.clientX) {
-    mouseX = (p.touches[0].clientX - b.left) * w / game_area.clientWidth;
-    mouseY = (p.touches[0].clientY - b.top) * h / game_area.clientHeight;
-    if (mouseX < 0 || mouseX > w || mouseY < 0 || mouseY > h)
-      mouseOver = false;
-    else
-      mouseOver = true;
-  } else {
-    mouseX = (p.clientX - b.left) * w / game_area.clientWidth;
-    mouseY = (p.clientY - b.top) * h / game_area.clientHeight;
-  }
+class PIDController {
+    constructor(params) {
+        this.kP = params.kP;
+        this.kI = params.kI;
+        this.kD = params.kD;
+
+        this.prevTime = null;
+        this.prevError = null;
+        this.integral = 0;
+    }
+
+    reset() {
+        this.prevTime = null;
+        this.prevError = null;
+        this.integral = 0;
+    }
+
+    controlVariable(error) {
+        let time = new Date();
+
+        let result = error * this.kP;
+        if (this.prevTime) {
+            let deltaError = error - this.prevError;
+            let deltaTime = (time - this.prevTime) / 1000;
+
+            this.integral += error * deltaTime;
+            this.integral += deltaError * deltaTime / 2;
+            result += this.integral * this.kI;
+
+            let derivative = deltaError / deltaTime;
+            result += derivative * this.kD;
+        }
+
+        this.prevTime = time;
+        this.prevError = error;
+        return result;
+    }
 }
 
-const kFres = -0.25;
+class BallFactory {
+    constructor(canvas, ballParams) {
+        this.mouse = new Mouse(canvas);
+        this.ballParams = ballParams;
+    }
 
-function gameTick() {
-  x += Vx * dt;
-  y += Vy * dt;
-  if (mouseOver && mousePressed) {
-    let ax = 5 * (mouseX - x);
-    Vx += ax * dt;
-    x += ax * dt ** 2 / 2;
-    let ay = 5 * (mouseY - y);
-    Vy += ay * dt;
-    y += ay * dt ** 2 / 2;
-  } {
-    let ax = kFres * Vx;
-    Vx += ax * dt;
-    x += ax * dt ** 2 / 2;
-    let ay = kFres * Vy;
-    Vy += ay * dt;
-    y += ay * dt ** 2 / 2;
-  }
-  if (x < r) {
-    x = 2 * r - x;
-    Vx *= -0.75;
-  }
-  if (x > w - r) {
-    x = 2 * (w - r) - x;
-    Vx *= -0.75;
-    Vy *= 0.95;
-  }
-  if (y < r) {
-    y = 2 * r - y;
-    Vx *= 0.95;
-    Vy *= -0.75;
-  }
-  if (y > h - r) {
-    y = 2 * (h - r) - y;
-    Vx *= 0.95;
-    Vy *= -0.75;
-  }
-
-  let context = game_area.getContext("2d");
-  context.clearRect(0, 0, game_area.width, game_area.height);
-  context.beginPath();
-  context.arc(x, y, 50, 0, 2 * Math.PI, false);
-  context.fillStyle = "#01BACE";
-  context.fill();
+    getBall() {
+        return new Ball(this.ballParams);
+    }
 }
+
+class Ball {
+    constructor(params) {
+        this.mouse = params.mouse;
+        this.position = params.position;
+        this.radius = params.radius;
+        this.airResistance = params.airResistance;
+        this.hitSpeedCoef = params.hitSpeedCoef;
+        this.hitSpeedCoefSecondary = params.hitSpeedCoefSecondary;
+        this.speed = new Vector(0, 0);
+        let PIDParams = params.PIDParams;
+        this.controller = new Vector(new PIDController(PIDParams), new PIDController(PIDParams));
+        PIDParams.kI = 0;
+        this.controller.both = new PIDController(PIDParams);
+    }
+
+    update(deltaTime) {
+        let dt = deltaTime / 1000;
+        let shift = this.speed.multiply(dt);
+        let acceleration = this.speed.multiply(this.airResistance);
+        shift = shift.add(acceleration.multiply(Math.pow(dt, 2) / 2));
+        this.position = this.position.add(shift)
+        this.speed = this.speed.add(acceleration.multiply(dt));
+
+        const g = 1;
+        acceleration = new Vector(0, g);
+        shift = shift.add(acceleration.multiply(Math.pow(dt, 2) / 2));
+        this.position = this.position.add(shift)
+        this.speed = this.speed.add(acceleration.multiply(dt));
+
+        if (this.mouse.isActive) {
+            let acceleration = new Vector(
+                this.controller.x.controlVariable(this.mouse.position.x - this.position.x),
+                this.controller.y.controlVariable(this.mouse.position.y - this.position.y)
+            );
+            this.speed = this.speed.add(acceleration.multiply(dt));
+            this.position = this.position.add(acceleration.multiply(Math.pow(dt, 2) / 2));
+
+            let deltaPosition = this.mouse.position.add(this.position.negate());
+            let accelerationBoth = this.controller.both.controlVariable(deltaPosition.length);
+            deltaPosition.normalize();
+            let accelerationBothVec = deltaPosition.multiply(accelerationBoth);
+            this.speed = this.speed.add(accelerationBothVec.multiply(dt));
+            this.position = this.position.add(accelerationBothVec.multiply(Math.pow(dt, 2) / 2));
+        } else {
+            this.controller.x.reset();
+            this.controller.y.reset();
+        }
+
+        let h = 1;
+        let w = 16 / 9;
+        if (this.position.x < this.radius) {
+            this.position.x = 2 * this.radius - this.position.x;
+            this.speed.x *= -this.hitSpeedCoef;
+            this.speed.y *= this.hitSpeedCoefSecondary;
+        }
+        if (this.position.x > w - this.radius) {
+            this.position.x = 2 * (w - this.radius) - this.position.x;
+            this.speed.x *= -this.hitSpeedCoef;
+            this.speed.y *= this.hitSpeedCoefSecondary;
+        }
+        if (this.position.y < this.radius) {
+            this.position.y = 2 * this.radius - this.position.y;
+            this.speed.y *= -this.hitSpeedCoef;
+            this.speed.x *= this.hitSpeedCoefSecondary;
+        }
+        if (this.position.y > h - this.radius) {
+            this.position.y = 2 * (h - this.radius) - this.position.y;
+            this.speed.y *= -this.hitSpeedCoef;
+            this.speed.x *= this.hitSpeedCoefSecondary;
+        }
+    }
+}
+
+class Graphics {
+    constructor(canvas) {
+        this.canvas = canvas;
+        this.context = this.canvas.getContext("2d");
+        this.canvas.addEventListener("resize", this.resize.bind(this));
+        this.resize();
+    }
+
+    resize() {
+        this.canvas.style.width = "100%";
+        let w = this.canvas.clientWidth;
+        let h = w * 9 / 16;
+        const offset = 80;
+        if (h > window.innerHeight - offset) {
+            h = window.innerHeight - offset;
+            this.canvas.style.height = `${h}px`;
+            w = h * 16 / 9;
+            this.canvas.style.width = `${w}px`;
+        } else {
+            this.canvas.style.height = `${h}px`;
+        }
+        this.canvas.width = w;
+        this.canvas.height = h;
+    }
+
+    clear() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+
+    drawBall(ball) {
+        this.context.beginPath();
+        const x = ball.position.x * this.canvas.height;
+        const y = ball.position.y * this.canvas.height; // Because y goes up to 16/9
+        const r = ball.radius * this.canvas.height;
+        this.context.arc(x, y, r, 0, 2 * Math.PI, false);
+        this.context.fillStyle = "#01BACE";
+        this.context.fill();
+    }
+}
+
+class Game {
+    constructor(canvas) {
+        this.graphics = new Graphics(canvas);
+        this.factory = new BallFactory(canvas, {
+            mouse: new Mouse(canvas),
+            position: new Vector(16 / 9 / 2, 1 / 2),
+            radius: 1 / 20,
+            airResistance: -0.25,
+            hitSpeedCoef: 0.75,
+            hitSpeedCoefSecondary: 0.95,
+            PIDParams: {
+                kP: 50,
+                kI: 1,
+                kD: 10,
+            }
+        });
+        this.ball = this.factory.getBall();
+        this.prevTime = new Date();
+    }
+
+    update(deltaTime) {
+        this.ball.update(deltaTime);
+    }
+
+    tick() {
+        let time = new Date();
+        let deltaTime = time - this.prevTime;
+        this.update(deltaTime);
+        this.graphics.clear();
+        this.graphics.drawBall(this.ball);
+        this.prevTime = time;
+        window.requestAnimationFrame(this.tick.bind(this));
+    }
+
+    start() {
+        this.tick();
+    }
+}
+
+function main() {
+    let gameCanvas = document.getElementById("gameCanvas");
+    let game = new Game(gameCanvas);
+    game.start();
+}
+
+main();
