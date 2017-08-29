@@ -129,7 +129,7 @@ class MovableObject extends GameObject {
         return shortestDirection;
     }
 
-    bumpShift(other, tolerance = new Vector(0, 0)) {
+    bumpShift(other) {
         const rectA = this.boundaryRectangle;
         const rectB = other.boundaryRectangle;
         let shifts = {
@@ -146,38 +146,18 @@ class MovableObject extends GameObject {
             shifts[DirectionEnum.Up], shifts[DirectionEnum.Down],
             Utils.comparator(Utils.vectorLength)
         );
-        console.log(horizontalShift, verticalShift);
-        // let shift = new Vector(0, 0);
-        // if (horizontalShift.length < verticalShift.length) {
-        //     shift = shift.add(horizontalShift);
-        //     if (verticalShift.length < tolerance.y) {
-        //         shift = shift.add(verticalShift.multiply(1 / 2));
-        //     }
-        // } else {
-        //     shift = shift.add(verticalShift);
-        //     if (horizontalShift.length < tolerance.x) {
-        //         shift = shift.add(horizontalShift.multiply(1 / 2));
-        //     }
-        // }
-        // return shift;
-        if (horizontalShift.length <= tolerance.x && verticalShift.length <= tolerance.y) {
-            // debugger
-            // return new Vector(0, 0);
-            return horizontalShift.add(verticalShift).normalized;
-        } else {
-            return Utils.min(
-                horizontalShift, verticalShift,
-                Utils.comparator(Utils.vectorLength)
-            );
-        }
+        return Utils.min(
+            horizontalShift, verticalShift,
+            Utils.comparator(Utils.vectorLength)
+        );
     }
 
     /**
      * Pushes away this from other object on contact
      * @param {GameObject} other
      */
-    bump(other, tolerance = new Vector(0, 0)) {
-        const shift = this.bumpShift(other, tolerance);
+    bump(other) {
+        const shift = this.bumpShift(other);
         this.position = this.position
             .add(shift);
         // const rectA = this.boundaryRectangle;
@@ -197,14 +177,11 @@ class MovableObject extends GameObject {
         // }
         // this.position = this.position
         //     .add(shifts[indexOfMin]);
-        if (shift.x == 0 && shift.y != 0) {
+        if (shift.x == 0) {
             this.speed.y = 0;
-            return true;
-        } else if (shift.x != 0 && shift.y == 0) {
+        }
+        if (shift.y == 0) {
             this.speed.x = 0;
-            return true;
-        } else {
-            return false;
         }
     }
 
@@ -258,7 +235,6 @@ class Character extends MovableObject {
         this.setAirResistance(-10, 0);
         this.setFreeFallAcceleration(1000);
         this.setMaxSpeed(new Vector(300, 9000));
-        this.tolerance = new Vector(4, 1);
     }
 
     initAnimationController(animationsCollection) {
@@ -297,9 +273,10 @@ class Character extends MovableObject {
     }
 
     bump(object) {
-        if (super.bump(object, this.tolerance) && this.collisionDirection(object) == DirectionEnum.Up) {
+        if (this.collisionDirection(object) == DirectionEnum.Up) {
             this.canJump = true;
         }
+        super.bump(object)
     }
 
     halfBump(object) {
@@ -369,14 +346,13 @@ class Box extends MovableObject {
         super();
         this.setAirResistance(-10, 0);
         this.setFreeFallAcceleration(2500);
-        this.tolerance = new Vector(8, 8);
     }
 
     /**
      * @override 
      */
     bump(object) {
-        super.bump(object, this.tolerance);
+        super.bump(object);
     }
 
     /**
