@@ -1,9 +1,8 @@
 .sass-cache/
 *.css.map
 .vscode/
-gateman/dist/
 node_modules/
-gateman/sprites/unused/
+project/gateman/sprites/unused/
 
 # Cheetah Texture Packer and Tiled Map Editor
 tools/

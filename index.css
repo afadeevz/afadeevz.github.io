@@ -25,10 +25,14 @@ body {
     padding: 10px 20px;
 }
 
+.released {
+    color: darkgreen;
+}
+
 .wip {
     color: gray;
 }
 
-.released {
-    color: darkgreen;
+.hidden {
+    display: none;
 }
