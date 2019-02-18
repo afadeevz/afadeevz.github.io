@@ -5,6 +5,7 @@ function buildNumber() {
 
     number.addEventListener("mouseover", () => {
         number.innerHTML = atob(numberBase64);
+        number.href = `tel:${atob(numberBase64)}`;
     });
 }
 
