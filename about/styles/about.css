@@ -5,14 +5,14 @@ body
 
 h1
 {
-    font-family: 'Roboto', Serif;
+    font-family: 'Roboto', Serif, serif;
     font-size: 3em;
     color: #3e464a;
 }
 
 h2, h3, h4
 {
-    font-family: 'Roboto', Serif;
+    font-family: 'Roboto', Serif, serif;
     color: #03486b;
 }
 
@@ -33,7 +33,7 @@ h4
 
 .text
 {
-    font-family: 'PT Serif', Serif;
+    font-family: 'PT Serif', Serif, serif;
     line-height: 1.5em;
     color: #333333;
     margin: 15px;
@@ -58,41 +58,6 @@ h4
     margin: 10px;
 }
 
-.photo_image
-{
-    height: 250px;
-}
-
-.quote_author
-{
-    text-align: right;
-}
-
-.movie
-{
-    float: left;
-    width: 280px;
-    margin: 10px;
-    text-align: justify;
-}
-
-.movie_image
-{
-    display: block;
-    margin: 0 auto;
-    height: 400px;
-} 
-
-.movie_header
-{
-    text-align: center;
-}
-
-.movie_text
-{
-    text-indent: 30px;
-}
-
 @media screen and (max-width: 1220px)
 {
     .clear_medium
@@ -105,7 +70,7 @@ h4
         width: 800px;
     }
 
-    .basic, .movie
+    .basic
     {
         width: 380px;
     }
@@ -123,28 +88,20 @@ h4
         width: 100%;
     }
 
-    .basic, .movie
+    .basic
     {
         float: none;
         margin: 0 auto;
         width: 100%;
     }
 
-    .skills, .music, .contact
+    .skills, .contacts
     {
         width: 400px;
         max-width: 100%;
     }
 
-    .movie_image, .photo_image
-    {
-        width: auto;
-        max-width: 100%;
-        height: auto;
-        max-height: 480px;
-    }
-
-    .text, .header, .photo
+    .text, .header
     {
         text-align: center;
     }
