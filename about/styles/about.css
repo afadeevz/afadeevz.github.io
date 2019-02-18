@@ -1,108 +1,91 @@
-body
-{
+body {
     margin: 0;
+    background-color: #333333;
 }
 
-h1
-{
+h1, h2, h3, h4 {
+    color: rgba(96, 87, 255, 0.87);
     font-family: 'Roboto', Serif, serif;
+}
+
+h1 {
     font-size: 3em;
-    color: #3e464a;
 }
 
-h2, h3, h4
-{
-    font-family: 'Roboto', Serif, serif;
-    color: #03486b;
-}
-
-h2
-{
+h2 {
     font-size: 2em;
 }
 
-h3
-{
+h3 {
     font-size: 1.5em;
 }
 
-h4
-{
+h4 {
     font-size: 1em;
 }
 
-.text
-{
+.text {
     font-family: 'PT Serif', Serif, serif;
     line-height: 1.5em;
-    color: #333333;
+    color: rgb(238, 238, 238);
     margin: 15px;
 }
 
-.wrapper
-{
+.wrapper {
     width: 1200px;
     margin: 0 auto;
     font-size: 14pt;
 }
 
-.clear
-{
+.clear {
     clear: both;
 }
 
-.basic
-{
+.basic {
     float: left;
     width: 580px;
     margin: 10px;
 }
 
-@media screen and (max-width: 1220px)
-{
-    .clear_medium
-    {
+a {
+  color: rgba(134,255,145,0.87);
+}
+
+@media screen and (max-width: 1220px) {
+    .clear_medium {
         clear: both;
     }
 
-    .wrapper
-    {
+    .wrapper {
         width: 800px;
     }
 
-    .basic
-    {
+    .basic {
         width: 380px;
     }
 }
 
-@media screen and (max-width: 820px)
-{
-    .clear_small
-    {
+@media screen and (max-width: 820px) {
+    .clear_small {
         clear: both;
     }
 
-    .wrapper
-    {
+    .wrapper {
         width: 100%;
     }
 
-    .basic
-    {
+    .basic {
         float: none;
         margin: 0 auto;
         width: 100%;
     }
 
-    .skills, .contacts
-    {
+    .skills, .contacts {
         width: 400px;
         max-width: 100%;
     }
 
-    .text, .header
-    {
+    .text, .header {
         text-align: center;
     }
 }
