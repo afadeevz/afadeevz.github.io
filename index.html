@@ -1,30 +1,69 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-  <title>Welcome</title>
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link rel="stylesheet" type="text/css" href="index.css">
-  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <title>Welcome</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=PT+Serif" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="index.css">
+
+    <script src="index.js" defer></script>
 </head>
 
 <body>
-  <div class="wrapper">
+<div class="wrapper">
     <h1>Welcome</h1>
-    <a class="link released" href="about">About me</a>
-    <a class="link released" href="project/ball">Ball</a>
-    <a class="link hidden" href="project/maze_wars">Maze Wars</a>
-    <a class="link wip" href="project/ship_wars">Ship Wars</a>
-    <a class="link released" href="project/leg_movement">Leg Movement</a>
-    <a class="link released" href="project/clock">Clock</a>
-    <a class="link released" href="project/2048">2048</a>
-    <a class="link released" href="project/gateman">Gateman</a>
-    <a class="link hidden" href="project/hyperdrive">HyperDrive</a>
-    <a class="link wip" href="project/life">Conway's Life</a>
-    <a class="link wip" href="ood/lab9">Shape Editor</a>
+    <div class="introduction basic">
+        <h3 class="header">About me</h3>
+        <p class="text">
+            My name is Alexander Fadeev, I am
+            <span id="age"><strong>[Calculating...]</strong></span>
+            years old. I am student at Volga State Technical University. My specialization
+            is system programming. Currently I am a developer at iSpring Solutions.
+        </p>
+    </div>
+    <div class="clear_small"></div>
+    <div class="projects basic">
+        <h3 class="header">My projects</h3>
+        <ul class="text">
+            <li><a class="released" href="project/ball">Ball</a></li>
+            <li><a class="wip" href="project/ship_wars">Ship Wars</a></li>
+            <li><a class="released" href="project/leg_movement">Leg Movement</a></li>
+            <li><a class="released" href="project/clock">Clock</a></li>
+            <li><a class="released" href="project/2048">2048</a></li>
+            <li><a class="released" href="project/gateman">Gateman</a></li>
+            <li><a class="wip" href="project/life">Conway's Life</a></li>
+            <li><a class="wip" href="ood/lab9">Shape Editor</a></li>
+        </ul>
+    </div>
     <div class="clear"></div>
-  </div>
-
+    <div class="skills basic">
+        <h3 class="header">My skills / knowledge</h3>
+        <ul class="text">
+            <li>Competitive Programming</li>
+            <li><a style="color: #E65127">HTML</a> |
+                <a style="color: #0C73B8">CSS</a> |
+                <a style="color: #E7A328">JS</a></li>
+            <li><a style="color: #1B598E">C++</a></li>
+            <li><a style="color: #2DBCAF">Golang</a></li>
+        </ul>
+    </div>
+    <div class="clear_small"></div>
+    <div class="contacts basic">
+        <h3 class="header">Contacts</h3>
+        <ul class="text">
+            <li>VK - <a href="https://vk.com/fadeevz">vk.com/fadeevz</a></li>
+            <li>Email - <a href="mailto:1alexking1@gmail.com">1alexking1@gmail.com</a></li>
+            <li>Telegram - <a href="https://t.me/afadeevz">t.me/afadeevz</a></li>
+            <li>Mobile phone - <a id="number"><strong>[Spoiler]</strong></a></li>
+        </ul>
+    </div>
+    <div class="clear"></div>
+</div>
 </body>
 
 </html>
