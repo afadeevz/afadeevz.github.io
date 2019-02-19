@@ -27,7 +27,7 @@ h4 {
 }
 
 a {
-    color: rgba(134,255,145,0.87);
+    color: rgba(134, 255, 145, 0.87);
 }
 
 .clear {
@@ -35,15 +35,20 @@ a {
 }
 
 .wrapper {
-    padding: 30px;
     text-align: center;
     width: 1200px;
     margin: 0 auto;
     font-size: 14pt;
 }
 
+.link {
+    display: inline-block;
+    margin: 0 5px;
+    clear: both;
+}
+
 .released {
-    color: rgba(134,255,145,0.87);
+    color: rgba(134, 255, 145, 0.87);
 }
 
 .wip {
