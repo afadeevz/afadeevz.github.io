@@ -2,7 +2,7 @@ html,
 body {
     padding: 0;
     margin: 0;
-    background-color: #333333;
+    background-color: #141414;
 }
 
 h1, h2, h3, h4 {
@@ -47,7 +47,7 @@ a {
 }
 
 .wip {
-    color: rgba(134,255,145,0.25);
+    color: rgb(55, 110, 57);
 }
 
 .hidden {
