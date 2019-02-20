@@ -1,61 +1,5 @@
 import Vector from "../../common/Vector.mjs";
-
-class Mouse {
-    constructor(element) {
-        if (element) {
-            this.element = element;
-        } else {
-            this.element = window.document;
-        }
-        this.position = new Vector(null, null);
-        this.mouseOver = false;
-        this.mousePressed = false;
-
-        ["mousemove", "touchstart", "touchmove"].forEach((eventType) => {
-            this.element.addEventListener(eventType, this.update.bind(this));
-        });
-        ["mousedown", "touchstart"].forEach((eventType) => {
-            this.element.addEventListener(eventType, () => {
-                this.mousePressed = true;
-            });
-        });
-        ["mouseup", "touchend"].forEach((eventType) => {
-            window.addEventListener(eventType, () => {
-                this.mousePressed = false;
-            });
-        });
-        this.element.addEventListener("mouseover", () => {
-            this.mouseOver = true;
-        });
-        this.element.addEventListener("mouseout", () => {
-            this.mouseOver = false;
-        });
-    }
-
-    update(event) {
-        let b = this.element.getBoundingClientRect();
-        const w = this.element.clientWidth;
-        const h = this.element.clientHeight;
-        if (event.touches) {
-            const x = (event.touches[0].clientX - b.left) / w * 16 / 9;
-            const y = (event.touches[0].clientY - b.top) / h;
-            if (x < 0 || x > w || y < 0 || y > h) {
-                mouseOver = false;
-            } else {
-                mouseOver = true;
-            }
-            this.position.x = x;
-            this.position.y = y;
-        } else {
-            this.position.x = (event.clientX - b.left) / w * 16 / 9;
-            this.position.y = (event.clientY - b.top) / h;
-        }
-    }
-
-    get isActive() {
-        return (this.mousePressed && this.mouseOver);
-    }
-}
+import Mouse from "../../common/Mouse.mjs";
 
 class PIDController {
     constructor(params) {
@@ -136,7 +80,7 @@ class Ball {
         this.position = this.position.add(shift)
         this.speed = this.speed.add(acceleration.multiply(dt));
 
-        if (this.mouse.isActive) {
+        if (this.mouse.isPressed) {
             let acceleration = new Vector(
                 this.controller.x.controlVariable(this.mouse.position.x - this.position.x),
                 this.controller.y.controlVariable(this.mouse.position.y - this.position.y)
@@ -224,7 +168,7 @@ class Game {
     constructor(canvas) {
         this.graphics = new Graphics(canvas);
         this.factory = new BallFactory(canvas, {
-            mouse: new Mouse(canvas),
+            mouse: new Mouse(canvas, new Vector(16 / 9, 1)),
             position: new Vector(16 / 9 / 2, 1 / 2),
             radius: 1 / 20,
             airResistance: -0.25,

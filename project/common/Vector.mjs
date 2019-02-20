@@ -1,5 +1,5 @@
 export default class Vector {
-    constructor(x, y) {
+    constructor(x = 0, y = 0) {
         this.x = x;
         this.y = y;
     }
@@ -16,7 +16,7 @@ export default class Vector {
         return new Vector(this.x * value, this.y * value)
     }
 
-    negate(value) {
+    negate() {
         return this.multiply(-1);
     }
 
