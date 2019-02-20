@@ -61,39 +61,42 @@ class Ball {
         this.hitSpeedCoefSecondary = params.hitSpeedCoefSecondary;
         this.speed = new Vector(0, 0);
         let PIDParams = params.PIDParams;
-        this.controller = new Vector(new PIDController(PIDParams), new PIDController(PIDParams));
-        PIDParams.kI = 0;
-        this.controller.both = new PIDController(PIDParams);
+        this.controller = {
+            x: new PIDController(PIDParams),
+            y: new PIDController(PIDParams),
+            both: new PIDController(PIDParams),
+        };
+        this.controller.both.kI = 0; // FIXME
     }
 
     update(deltaTime) {
         let dt = deltaTime / 1000;
-        let shift = this.speed.multiply(dt);
-        let acceleration = this.speed.multiply(this.airResistance);
-        shift = shift.add(acceleration.multiply(Math.pow(dt, 2) / 2));
-        this.position = this.position.add(shift)
-        this.speed = this.speed.add(acceleration.multiply(dt));
+        let shift = this.speed.clone.multiply(dt);
+        let acceleration = this.speed.clone.multiply(this.airResistance);
+        shift.add(acceleration.clone.multiply(Math.pow(dt, 2) / 2));
+        this.position.add(shift);
+        this.speed.add(acceleration.clone.multiply(dt));
 
         const g = 1;
         acceleration = new Vector(0, g);
-        shift = shift.add(acceleration.multiply(Math.pow(dt, 2) / 2));
-        this.position = this.position.add(shift)
-        this.speed = this.speed.add(acceleration.multiply(dt));
+        shift.add(acceleration.clone.multiply(Math.pow(dt, 2) / 2));
+        this.position.add(shift);
+        this.speed.add(acceleration.clone.multiply(dt));
 
         if (this.mouse.isPressed) {
             let acceleration = new Vector(
                 this.controller.x.controlVariable(this.mouse.position.x - this.position.x),
                 this.controller.y.controlVariable(this.mouse.position.y - this.position.y)
             );
-            this.speed = this.speed.add(acceleration.multiply(dt));
-            this.position = this.position.add(acceleration.multiply(Math.pow(dt, 2) / 2));
+            this.speed.add(acceleration.clone.multiply(dt));
+            this.position.add(acceleration.clone.multiply(Math.pow(dt, 2) / 2));
 
-            let deltaPosition = this.mouse.position.add(this.position.negate());
+            let deltaPosition = this.mouse.position.clone.add(this.position.clone.negate());
             let accelerationBoth = this.controller.both.controlVariable(deltaPosition.length);
             deltaPosition.normalize();
-            let accelerationBothVec = deltaPosition.multiply(accelerationBoth);
-            this.speed = this.speed.add(accelerationBothVec.multiply(dt));
-            this.position = this.position.add(accelerationBothVec.multiply(Math.pow(dt, 2) / 2));
+            let accelerationBothVec = deltaPosition.clone.multiply(accelerationBoth);
+            this.speed.add(accelerationBothVec.clone.multiply(dt));
+            this.position.add(accelerationBothVec.clone.multiply(Math.pow(dt, 2) / 2));
         } else {
             this.controller.x.reset();
             this.controller.y.reset();
