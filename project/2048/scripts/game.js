@@ -1,4 +1,4 @@
-'use strict';
+import GameStorage from "./GameStorage.mjs";
 
 const Direction = {
     Right: "right",
@@ -620,10 +620,12 @@ class GameController {
         this.animation = new GameAnimationController(this.graphics);
         this.overlay = new GameOverlay(canvas);
         this.input = new GameInputController();
-        this.score = 0;
-        this.bestScore = 0;
         this.state = new GameState(this.rows, this.columns, this.targetTileLevel);
         this.animation.addState(this.state);
+        this.storage = new GameStorage();
+        this.score = 0;
+        this.load();
+        bestScore.innerHTML = this.bestScore;
         let restartButton = document.getElementById("restartButton");
         restartButton.addEventListener("mousedown", () => {
             this.restart();
@@ -637,17 +639,33 @@ class GameController {
         this.updateScore();
     }
 
+    doMove(direction) {
+        if (!this.state.move(direction)) {
+            return;
+        }
+
+        this.animation.addState(this.state);
+        this.updateScore();
+        this.save();
+
+        if (this.state.status === GameStatus.Won) {
+            const keyboardIgnoreTimeMs = 2500;
+            this.input.blockForMilliseconds(keyboardIgnoreTimeMs);
+        }
+    }
+
     doMoves() {
         while (this.input.moves.length) {
-            const direction = this.input.moves.shift();
-            if (this.state.move(direction)) {
-                this.animation.addState(this.state);
-            }
-            if (this.state.status === GameStatus.Won) {
-                const keyboardIgnoreTimeMs = 2500;
-                this.input.blockForMilliseconds(keyboardIgnoreTimeMs);
-            }
+            this.doMove(this.input.moves.shift());
         }
+    }
+
+    load() {
+        this.bestScore = this.storage.bestScore;
+    }
+
+    save() {
+        this.storage.bestScore = this.bestScore;
     }
 
     updateScore() {
@@ -665,13 +683,13 @@ class GameController {
 
     tick() {
         this.doMoves();
-        this.updateScore();
-        this.animation.draw();
+
         this.overlay.update(this.state.status);
+
+        this.animation.draw();
         this.overlay.draw();
-        window.requestAnimationFrame(() => {
-            this.tick();
-        });
+
+        window.requestAnimationFrame(this.tick.bind(this));
     }
 
     start() {
