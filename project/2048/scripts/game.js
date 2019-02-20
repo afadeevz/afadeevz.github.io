@@ -1,4 +1,6 @@
 import GameStorage from "./GameStorage.mjs";
+import Tile from "./Tile.mjs";
+import Random from "../../common/Random.mjs";
 
 const Direction = {
     Right: "right",
@@ -13,99 +15,6 @@ const GameStatus = {
     Continued: "continued",
     Lost: "lost",
 };
-
-const TileStatus = {
-    Empty: "empty",
-    Spawned: "spawned",
-    Still: "still",
-    Moved: "moved",
-    Merged: "merged",
-};
-
-let MathUtils = {
-    randomInRange: function (n) {
-        return Math.min(n - 1, Math.floor(Math.random() * n));
-    }
-};
-
-class Tile {
-    constructor(index) {
-        this.index = index;
-        this.level = null;
-        this.prevIndex = null;
-        this.prevLevel = null;
-        this.status = TileStatus.Empty;
-    }
-
-    reset() {
-        this.level = null;
-        this.prevIndex = null;
-        this.prevLevel = null;
-        this.status = TileStatus.Empty;
-    }
-
-    get isEmpty() {
-        return (this.status === TileStatus.Empty);
-    }
-
-    get ableToMerge() {
-        return (this.status !== TileStatus.Merged && this.status !== TileStatus.Empty);
-    }
-
-    get scoreValue() {
-        if (this.isEmpty) {
-            return null;
-        } else {
-            return Math.pow(2, this.level);
-        }
-    }
-
-    prepareForMove() {
-        if (!this.isEmpty) {
-            this.prevIndex = [this.index];
-            this.prevLevel = [this.level];
-            this.status = TileStatus.Still;
-        }
-    }
-
-    spawn() {
-        this.level = 1 + Math.floor(MathUtils.randomInRange(10) / 9);
-        this.status = TileStatus.Spawned;
-    }
-
-    mergeWith(tile) {
-        if (!this.isEmpty) {
-            tile.level++;
-            tile.prevIndex.push(this.prevIndex[0]);
-            tile.prevLevel.push(this.prevLevel[0]);
-            tile.status = TileStatus.Merged;
-            this.reset();
-        }
-    }
-
-    moveTo(tile) {
-        if (!this.isEmpty) {
-            tile.level = this.level;
-            tile.prevLevel = this.prevLevel;
-            tile.prevIndex = this.prevIndex;
-            tile.status = TileStatus.Moved;
-            this.reset();
-        }
-    }
-
-    equals(tile) {
-        return (this.index === tile.index && this.level === tile.level);
-    }
-
-    clone() {
-        let clonedTile = new Tile(this.index);
-        clonedTile.level = this.level;
-        clonedTile.prevLevel = this.prevLevel;
-        clonedTile.prevIndex = this.prevIndex;
-        clonedTile.status = this.status;
-        return clonedTile;
-    }
-}
 
 class GameState {
     constructor(rows, columns, targetTileLevel) {
@@ -208,7 +117,7 @@ class GameState {
         if (!this.isFull) {
             let index;
             do {
-                index = MathUtils.randomInRange(this.boardSize);
+                index = Random.inRange(this.boardSize);
             } while (!this.tiles[index].isEmpty);
             this.tiles[index].spawn();
         }
@@ -404,7 +313,7 @@ class GameGraphicsController {
         const row = Math.floor(tile.index / this.columns);
         const col = tile.index % this.columns;
         const movingPhaseEnd = .5;
-        if (tile.status !== TileStatus.Empty && tile.status !== TileStatus.Spawned) {
+        if (tile.status !== Tile.Status.Empty && tile.status !== Tile.Status.Spawned) {
             for (let id = 0; id < tile.prevIndex.length; id++) {
                 const prevRow = Math.floor(tile.prevIndex[id] / this.columns);
                 const prevCol = tile.prevIndex[id] % this.columns;
@@ -418,10 +327,10 @@ class GameGraphicsController {
         const appearingPhaseStart = movingPhaseEnd;
         if (animationProgress > appearingPhaseStart) {
             const phaseProgress = (animationProgress - appearingPhaseStart) / (1 - appearingPhaseStart);
-            if (tile.status === TileStatus.Spawned) {
+            if (tile.status === Tile.Status.Spawned) {
                 this.drawTile(row, col, tile.level, phaseProgress);
             }
-            if (tile.status === TileStatus.Merged) {
+            if (tile.status === Tile.Status.Merged) {
                 const scale = -Math.pow(phaseProgress, 2) + phaseProgress + 1;
                 this.drawTile(row, col, tile.level, scale);
             }
