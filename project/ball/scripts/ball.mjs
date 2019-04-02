@@ -1,5 +1,5 @@
-import Vector from "../../common/Vector.mjs";
-import Mouse from "../../common/Mouse.mjs";
+import Vector from "../../../common/Vector.mjs";
+import Mouse from "../../../common/Mouse.mjs";
 
 class PIDController {
     constructor(params) {
