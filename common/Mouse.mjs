@@ -16,6 +16,13 @@ export default class Mouse {
         return this._mouseOver && this._mousePressed
     }
 
+    onMove(cb) {
+        this._element.addEventListener("mousemove", (event) => {
+            this._onMouseMove(event);
+            cb(this.position);
+        })
+    }
+
     _init() {
         this._element.addEventListener("mousemove", this._onMouseMove.bind(this));
         this._element.addEventListener("mousedown", this._onMouseDown.bind(this));
