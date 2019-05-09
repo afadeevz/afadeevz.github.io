@@ -4,13 +4,28 @@ export default class Vector {
         this.y = y;
     }
 
-    get length() {
-        return Math.hypot(this.x, this.y);
+    static FromPolar(angle, length) {
+        return new Vector(length * Math.cos(angle), length * Math.sin(angle));
+    }
+
+    static get Zero() {
+        return new Vector(0, 0);
+    }
+
+    get length() { // TODO
+        // return Math.hypot(this.x, this.y);
+        return Math.sqrt(this.x * this.x + this.y * this.y);
     }
 
     add(vector) {
         this.x += vector.x;
         this.y += vector.y;
+        return this;
+    }
+
+    sub(vector) {
+        this.x -= vector.x;
+        this.y -= vector.y;
         return this;
     }
 
@@ -40,6 +55,9 @@ export default class Vector {
         return (this.x * vec.x + this.y * vec.y);
     }
 
+    vectorProductLength(vec) {
+        return Math.abs(this.x * vec.y - this.y * vec.x);
+    }
 
     get clone() {
         return new Vector(this.x, this.y);
