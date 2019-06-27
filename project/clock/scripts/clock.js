@@ -97,7 +97,8 @@ class Clock {
     this.drawFace();
 
     let radius = d / 2 - 30;
-    let seconds = time.getSeconds();
+    let milliseconds = time.getMilliseconds();
+    let seconds = time.getSeconds() + milliseconds / 1000;
     let minutes = time.getMinutes() + seconds / 60;
     let hours = (time.getHours() + minutes / 60) % 12;
 
@@ -137,9 +138,7 @@ class Clock {
     if (!this.isPaused) {
       this.draw(this.time);
     }
-    window.setTimeout(() => {
-      window.requestAnimationFrame(() => { this.tick(); });
-    }, 1000 - this.time.getMilliseconds());
+    window.requestAnimationFrame(this.tick.bind(this));
   }
 
   start() {
