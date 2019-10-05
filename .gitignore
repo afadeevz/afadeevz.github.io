@@ -4,5 +4,11 @@
 node_modules/
 project/gateman/sprites/unused/
 
-# Cheetah Texture Packer and Tiled Map Editor
-tools/
+# Other repos
+maze-wars
+2048
+gateman
+balls
+tic-tac-spin
+ray-marching-demo
+mandelbrot
