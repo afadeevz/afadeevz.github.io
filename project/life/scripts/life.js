@@ -15,16 +15,37 @@ function map(x, fromLow, fromHigh, toLow, toHigh) {
 
 class App {
     constructor(config) {
-        this.canvas = config.canvas
+        this.canvas = config.canvas;
         this.context = this.canvas.getContext("2d");
         this.rows = config.rows;
         this.cols = config.cols;
         this.field = newMatrix(this.rows, this.cols);
         this.count = 0;        
-        this.initField();
+        this.reset();
         window.addEventListener("resize", this.resizeCanvas.bind(this));
         this.resizeCanvas();
+    }
 
+    reset() {
+        this.hashes = [];
+        this.initField();
+    }
+
+    get hash() {
+        let hash = 0;
+
+        for (let row of this.field) {
+            for (let cell of row) {
+                hash *= 3;
+                if (cell) {
+                    hash += 1;
+                }
+
+                hash %= 1 << 31;
+            }
+        }
+
+        return hash;
     }
 
     initField() {
@@ -43,7 +64,7 @@ class App {
         this.canvas.height = h;
     }
 
-    drawRectangle(rect, borderColor, fillColor) {
+    drawRectangle(rect, fillColor, borderColor = fillColor) {
         this.context.fillStyle = fillColor;
         this.context.fillRect(rect.x, rect.y, rect.w, rect.h);
 
@@ -52,18 +73,22 @@ class App {
     }
 
     drawCell(row, col) {
+        if (!this.field[row][col]) {
+            return;
+        }
+
         const rect = {
             x: map(col, 0, this.cols, 0, this.canvas.width),
             y: map(row, 0, this.rows, 0, this.canvas.height),
             w: map(1, 0, this.cols, 0, this.canvas.width),
             h: map(1, 0, this.rows, 0, this.canvas.height),
         };
-        const borderColor = "#444444";
-        const fillColor = this.field[row][col] ? "#7700FF": "#DDDDDD";
-        this.drawRectangle(rect, borderColor, fillColor);
+        const fillColor = "#7700FF";
+        this.drawRectangle(rect, fillColor);
     }
     
     drawField() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         for (let row = 0; row < this.rows; row++) {
             for (let col = 0; col < this.cols; col++) {
                 this.drawCell(row, col);
@@ -109,22 +134,40 @@ class App {
                 const count = neighboursCount[row][col];
                 if (this.field[row][col] && ((count < 2) || (count > 3))) {
                     this.field[row][col] = false;
-                } else if (!(this.field[row][col]) && count == 3) {
+                } else if (!(this.field[row][col]) && count === 3) {
                     this.field[row][col] = true;
                 }
             }
         }
     }
 
+    handleRepetitions() {
+        const maxHashesSize = 1000;
+
+        this.hashes.push(this.hash);
+        if (this.hashes.length > maxHashesSize) {
+            this.hashes.splice(0, 1);
+        }
+
+        for (let i = Math.floor((this.hashes.length + 1) / 2); i < this.hashes.length - 1; i++) {
+            const delta = this.hashes.length - i - 1;
+            if (this.hashes[i + delta] === this.hashes[i] && this.hashes[i] === this.hashes[i - delta]) {
+                this.reset();
+                break;
+            }
+        }
+    }
+
     update() {
         this.calcNextGeneration();
+        this.handleRepetitions();
     }
 
     loop() {
         this.count += 1;
         this.count %= 1;
-        if (this.count == 0) {
-            this.draw()
+        if (this.count === 0) {
+            this.draw();
             this.update() 
         }
 
@@ -137,13 +180,13 @@ class App {
 }
 
 function main() {
-    const canvas = document.getElementById("canvas")
+    const canvas = document.getElementById("canvas");
     const config = {
         canvas: canvas,
-        rows: 36,
-        cols: 64,
+        rows: 72,
+        cols: 128   ,
     };
-    const app = new App(config)
+    const app = new App(config);
     app.run()
 }
 
