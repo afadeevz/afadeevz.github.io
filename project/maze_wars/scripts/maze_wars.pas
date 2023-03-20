@@ -1,4 +1,5 @@
 // This is really old PAS file which I'm gonna rewrite in JS
+// Spoiler: I didn't
 
 //-------CONST-------//
 CONST cz0 = 25;
