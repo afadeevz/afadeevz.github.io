@@ -1,6 +1,6 @@
 
-const startTimeMS = Date.parse("2024-04-10T12:00:00.000+03:00")
-const endTimeMS = Date.parse("2024-05-10T12:00:00.000+03:00")
+const startTimeMS = Date.parse("2077-04-10T12:00:00.000+03:00")
+const endTimeMS = Date.parse("2077-05-10T12:00:00.000+03:00")
 const startCost = 450000;
 const endCost = 350000;
 
