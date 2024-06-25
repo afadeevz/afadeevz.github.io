@@ -1,8 +1,8 @@
 
-const startTimeMS = Date.parse("2077-04-10T12:00:00.000+03:00")
-const endTimeMS = Date.parse("2077-05-10T12:00:00.000+03:00")
-const startCost = 450000;
-const endCost = 350000;
+const startTimeMS = Date.parse("2024-06-26T12:00:00.000+03:00")
+const endTimeMS = Date.parse("2024-10-01T12:00:00.000+03:00")
+const startCost = 500000;
+const endCost = 300000;
 
 function lerp(progress, start, end) {
     return start * (1 - progress) + end * progress;
